@@ -30,6 +30,7 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/gl/GLee.h"
 #else
+	#include <GL/gl.h>
 	#define CINDER_GLES
 	#define CINDER_GLES1
 #endif
