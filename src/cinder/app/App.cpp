@@ -34,6 +34,9 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/msw/OutputDebugStringStream.h"
 	#include "cinder/app/AppImplMsw.h"
+
+#elif defined( CINDER_LINUX )
+	#include "cinder/app/AppImplQt.h"
 #endif
 
 using namespace std;

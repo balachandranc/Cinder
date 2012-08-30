@@ -204,6 +204,8 @@ class AppBasic : public App {
 #elif defined( CINDER_MSW )
 	class AppImplMswBasic	*mImpl;
 	friend class AppImplMswBasic;
+#elif defined( CINDER_LINUX )
+	class AppImplQtBasic *mImpl;
 #endif
 	
 	std::vector<std::string>	mCommandLineArgs;

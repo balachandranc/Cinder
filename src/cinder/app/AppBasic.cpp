@@ -29,6 +29,8 @@
 	#include <Shellapi.h>
 	#include "cinder/Utilities.h"
 	#include "cinder/app/AppImplMswBasic.h"
+#elif defined( CINDER_LINUX )
+	#include "cinder/app/AppImplQtBasic.h"
 #endif
 
 namespace cinder { namespace app {
@@ -93,8 +95,11 @@ void AppBasic::launch( const char *title, int argc, char * const argv[] )
 
 #if defined( CINDER_COCOA )
 	mImpl = [[::AppImplCocoaBasic alloc] init:this];
-#else
+#elif defined( CINDER_MSW )
 	mImpl = new AppImplMswBasic( this );	
+	mImpl->run();
+#elif defined( CINDER_LINUX )
+	mImpl = new AppImplQtBasic( this );
 	mImpl->run();
 #endif
 // NOTHING AFTER THIS LINE RUNS
