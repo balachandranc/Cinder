@@ -1,5 +1,6 @@
 #include "cinder/app/AppBasic.h"
 #include "cinder/Rand.h"
+
 using namespace ci;
 using namespace ci::app;
 
@@ -47,7 +48,9 @@ void BasicApp::draw()
 	glBegin( GL_LINE_STRIP );
 	// iterate across our list of points, and pass each one to OpenGL
 	for( list<Vec2f>::iterator pointIter = mPoints.begin(); pointIter != mPoints.end(); ++pointIter ) {
-		glVertex2f( *pointIter );
+		float x = (*pointIter)[0];
+		float y = (*pointIter)[1];
+		glVertex2f( x, y );
 	}
 	// tell OpenGL to actually draw the lines now
 	glEnd();

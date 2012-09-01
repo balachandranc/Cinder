@@ -20,37 +20,38 @@
  POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "cinder/app/AppImplMswRendererGl.h"
+#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/gl/gl.h"
 #include "cinder/app/App.h"
 #include "cinder/Camera.h"
-#include <windowsx.h>
 
 namespace cinder { namespace app {
 
 bool sMultisampleSupported = false;
 int sArbMultisampleFormat;
 
-AppImplMswRendererGl::AppImplMswRendererGl( App *aApp, RendererGl *aRenderer )
-	: AppImplMswRenderer( aApp ), mRenderer( aRenderer )
+AppImplQtRendererGl::AppImplQtRendererGl( App *aApp, RendererGl *aRenderer )
+	: mApp( aApp ), mRenderer( aRenderer )
 {
-	mPrevRC = 0;
-	mRC = 0;
+	//mPrevRC = 0;
+	//mRC = 0;
 }
 
-void AppImplMswRendererGl::prepareToggleFullScreen()
+void AppImplQtRendererGl::prepareToggleFullScreen()
 {
-	mPrevRC = mRC;
+	//mPrevRC = mRC;
 }
 
-void AppImplMswRendererGl::finishToggleFullScreen()
+void AppImplQtRendererGl::finishToggleFullScreen()
 {
+	/*
 	if( mPrevRC ) {
 		::wglDeleteContext( mPrevRC );
 	}
+	*/
 }
 
-void AppImplMswRendererGl::defaultResize() const
+void AppImplQtRendererGl::defaultResize() const
 {
 	glViewport( 0, 0, mApp->getWindowWidth(), mApp->getWindowHeight() );
 	cinder::CameraPersp cam( mApp->getWindowWidth(), mApp->getWindowHeight(), 60.0f );
@@ -64,16 +65,17 @@ void AppImplMswRendererGl::defaultResize() const
 	glTranslatef( 0.0f, (float)-mApp->getWindowHeight(), 0.0f );       // shift origin up to upper-left corner.
 }
 
-void AppImplMswRendererGl::swapBuffers() const
+void AppImplQtRendererGl::swapBuffers() const
 {
-	::SwapBuffers( mDC );
+	//::SwapBuffers( mDC );
 }
 
-void AppImplMswRendererGl::makeCurrentContext()
+void AppImplQtRendererGl::makeCurrentContext()
 {
-	::wglMakeCurrent( mDC, mRC );
+	//::wglMakeCurrent( mDC, mRC );
 }
 
+/*
 HWND createDummyWindow( int *width, int *height, bool fullscreen )
 {
 	DWORD windowExStyle, windowStyle;
@@ -144,9 +146,11 @@ HWND createDummyWindow( int *width, int *height, bool fullscreen )
 
 	return wnd;
 }
+*/
 
-bool AppImplMswRendererGl::initialize( HWND wnd, HDC dc )
+bool AppImplQtRendererGl::initialize( /*HWND wnd, HDC dc */)
 {
+	/*
 	if( ( ! sMultisampleSupported ) && mRenderer->getAntiAliasing() ) {
 		// first create a dummy window and use it to determine if we can do antialiasing
 		int width = mApp->getWindowWidth();
@@ -164,12 +168,13 @@ bool AppImplMswRendererGl::initialize( HWND wnd, HDC dc )
 			return false;
 		// now do it again but with newly created multisample settings
 	}
-	
-	return initializeInternal( wnd, dc );
+	*/
+	return initializeInternal( /*wnd, dc */);
 }
 
-bool AppImplMswRendererGl::initializeInternal( HWND wnd, HDC dc )
+bool AppImplQtRendererGl::initializeInternal( /*HWND wnd, HDC dc */)
 {
+	/*
 	int pixelFormat;
 	mWnd = wnd;
 	mDC = dc;
@@ -196,12 +201,12 @@ bool AppImplMswRendererGl::initializeInternal( HWND wnd, HDC dc )
 		0, 0, 0										// Layer Masks Ignored
 	};
 
-	/*
+	****
 	Our first pass, Multisampling hasn't been created yet, so we create a window normally
 	If it is supported, then we're on our second pass
 	that means we want to use our pixel format for sampling
 	so set PixelFormat to arbMultiSampleformat instead
-	*/
+	*****
 	if( ! sMultisampleSupported ) {
 		pixelFormat = ::ChoosePixelFormat( dc, &pfd );				// Find A Compatible Pixel Format
 		if( pixelFormat == 0 ) {												// Did We Find A Compatible Format?
@@ -242,12 +247,13 @@ bool AppImplMswRendererGl::initializeInternal( HWND wnd, HDC dc )
 	if( mPrevRC ) {
 		wglShareLists( mPrevRC, mRC );
 	}
-
+	 */
 	return true;									// Success
 }
 
-int AppImplMswRendererGl::initMultisample( PIXELFORMATDESCRIPTOR pfd, int requestedLevelIdx, HDC dc )
+int AppImplQtRendererGl::initMultisample( /*PIXELFORMATDESCRIPTOR pfd, int requestedLevelIdx, HDC dc */)
 {
+	/*
 	// this is an array that corresponds to AppSettings::AA_NONE through AA_MSAA_16
 	if( ( ! WGL_ARB_multisample ) || ( ! wglChoosePixelFormatARB ) ) {
 		sMultisampleSupported = false;
@@ -296,17 +302,20 @@ int AppImplMswRendererGl::initMultisample( PIXELFORMATDESCRIPTOR pfd, int reques
 	}
 
 	// Return failure if we hit level 0
+	 */
 	return 0;
 }
 
-void AppImplMswRendererGl::kill()
+void AppImplQtRendererGl::kill()
 {
+	/*
 	if( mRC ) {											// Do We Have A Rendering Context?
 		::wglMakeCurrent( NULL, NULL );					// release The DC And RC Contexts
 		::wglDeleteContext( mRC );						// delete The RC
 	}
 
 	mRC = 0;
+	*/
 }
 
 } } // namespace cinder::app

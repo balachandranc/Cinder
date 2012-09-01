@@ -40,13 +40,14 @@ class AppImplQtRendererGl {
 	virtual void	makeCurrentContext();
 
  protected:
-	//bool	initializeInternal( HWND wnd, HDC dc );
-	//int		initMultisample( PIXELFORMATDESCRIPTOR pfd, int requestedLevelIdx, HDC dc );
+	bool	initializeInternal(/* HWND wnd, HDC dc */);
+	int		initMultisample( /*PIXELFORMATDESCRIPTOR pfd, int requestedLevelIdx, HDC dc */);
 	
 	RendererGl	*mRenderer;
 	bool		mWasFullScreen;
 	//HGLRC		mRC, mPrevRC;
 	//HDC			mDC;
+	App			*mApp;
 };
 
 } } // namespace cinder::app

@@ -183,6 +183,8 @@ class AppBasic : public App {
 	static void		executeLaunch( AppBasic *app, class Renderer *renderer, const char *title );
 #elif defined( CINDER_MAC )
 	static void		executeLaunch( AppBasic *app, class Renderer *renderer, const char *title, int argc, char * const argv[] ) { sInstance = app; App::executeLaunch( app, renderer, title, argc, argv ); }
+#elif defined( CINDER_LINUX )
+	static void		executeLaunch( AppBasic *app, class Renderer *renderer, const char *title, int argc, char * const argv[] );
 #endif
 	static void		cleanupLaunch() { App::cleanupLaunch(); }
 	
@@ -238,5 +240,15 @@ class AppBasic : public App {
 		cinder::app::AppBasic::executeLaunch( app, ren, #APP );										\
 		cinder::app::AppBasic::cleanupLaunch();														\
 		return 0;																					\
+	}
+#elif defined( CINDER_LINUX )
+	#define CINDER_APP_BASIC( APP, RENDERER )								\
+	int main( int argc, char * const argv[] ) {							\
+		cinder::app::AppBasic::prepareLaunch();								\
+		cinder::app::AppBasic *app = new APP;								\
+		cinder::app::Renderer *ren = new RENDERER;							\
+		cinder::app::AppBasic::executeLaunch( app, ren, #APP, argc, argv );	\
+		cinder::app::AppBasic::cleanupLaunch();								\
+		return 0;															\
 	}
 #endif
