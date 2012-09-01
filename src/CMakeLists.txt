@@ -26,6 +26,10 @@ endforeach(flag_var)
 
 #incude cinder and boost header files and libraries.
 set(CINDER_ROOT "./")
-include_directories("${CINDER_ROOT}/../include" "/usr/include/boost")
+include_directories(
+	"${CINDER_ROOT}/../include" 
+	"/usr/include/boost"
+	"${CINDER_ROOT}/libtess2"
+)
 
 add_subdirectory(cinder)
