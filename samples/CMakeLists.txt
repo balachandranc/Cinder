@@ -38,10 +38,11 @@ set(CINDER_INCLUDE_DIRS "${CINDER_ROOT}/include"
 include_directories(${CINDER_INCLUDE_DIRS})
 	
 set(CINDER_LIB_DIR ${CINDER_ROOT}/build/cinder)
-set(CINDER_LIBRARIES 
+set(CINDER_LIBRARIES
 	${CINDER_LIB_DIR}/app/libapp.a
 	${CINDER_LIB_DIR}/gl/libgl.a
 	${CINDER_LIB_DIR}/libcinder.a
+	${CINDER_LIB_DIR}/../libtess2/libtess2.a 
 	)
 
 add_subdirectory(

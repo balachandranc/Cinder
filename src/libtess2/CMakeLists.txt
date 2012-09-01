@@ -1,0 +1,9 @@
+add_library(tess2
+	tess.c
+	geom.c
+	mesh.c
+	bucketalloc.c
+	sweep.c
+	dict.c
+	priorityq.c
+)

@@ -33,3 +33,4 @@ include_directories(
 )
 
 add_subdirectory(cinder)
+add_subdirectory(libtess2)
