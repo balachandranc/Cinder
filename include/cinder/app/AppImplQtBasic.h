@@ -23,7 +23,7 @@
 #pragma once
 
 #include "cinder/app/AppImplQt.h"
-#include "cinder/app/AppImplQtRenderer.h"
+//#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/Display.h"
 
 namespace cinder { namespace app {
@@ -65,8 +65,8 @@ class AppImplQtBasic : public AppImplQt {
 	HDC						mDC;
 	HINSTANCE				mInstance;
 	DWORD					mWindowStyle, mWindowExStyle;
-	double					mNextFrameTime;
 	*/
+	double					mNextFrameTime;
 	Display					*mDisplay;
 	/*
 	std::map<DWORD,Vec2f>	mMultiTouchPrev;

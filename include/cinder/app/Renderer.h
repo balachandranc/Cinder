@@ -82,6 +82,12 @@ class Renderer {
 
 	virtual HWND				getHwnd() = 0;
 	virtual HDC					getDc() { throw; } // the default behavior is failure
+#elif defined( CINDER_LINUX )
+	virtual void setup( App *aApp) = 0;
+
+	virtual void prepareToggleFullScreen() {}
+	virtual void finishToggleFullScreen() {}
+	virtual void kill() {}
 #endif
 
 	virtual Surface	copyWindowSurface( const Area &area ) = 0;

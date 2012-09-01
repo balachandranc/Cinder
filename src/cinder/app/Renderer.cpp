@@ -40,6 +40,8 @@
 	#include "cinder/app/AppImplMsw.h"
 	#include "cinder/app/AppImplMswRendererGl.h"
 	#include "cinder/app/AppImplMswRendererGdi.h"
+#elif defined( CINDER_LINUX )
+	#include "cinder/app/AppImplQtRendererGl.h"
 #endif
 #include "cinder/ip/Flip.h"
 
@@ -237,6 +239,63 @@ Surface	RendererGl::copyWindowSurface( const Area &area )
 	return s;
 }
 
+#elif defined( CINDER_LINUX )
+RendererGl::~RendererGl()
+{
+	delete mImpl;
+}
+
+void RendererGl::setup( App *aApp/*, HWND wnd, HDC dc */)
+{
+	//mWnd = wnd;
+	mApp = aApp;
+	if( ! mImpl )
+		mImpl = new AppImplQtRendererGl( mApp, this );
+	mImpl->initialize( /*wnd, dc */);
+}
+
+void RendererGl::kill()
+{
+	mImpl->kill();
+}
+
+void RendererGl::prepareToggleFullScreen()
+{
+	mImpl->prepareToggleFullScreen();
+}
+
+void RendererGl::finishToggleFullScreen()
+{
+	mImpl->finishToggleFullScreen();
+}
+
+void RendererGl::startDraw()
+{
+	mImpl->makeCurrentContext();
+}
+
+void RendererGl::finishDraw()
+{
+	mImpl->swapBuffers();
+}
+
+void RendererGl::defaultResize()
+{
+	mImpl->defaultResize();
+}
+
+Surface	RendererGl::copyWindowSurface( const Area &area )
+{
+	Surface s( area.getWidth(), area.getHeight(), false );
+	glFlush(); // there is some disagreement about whether this is necessary, but ideally performance-conscious users will use FBOs anyway
+	GLint oldPackAlignment;
+	glGetIntegerv( GL_PACK_ALIGNMENT, &oldPackAlignment );
+	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+	glReadPixels( area.x1, mApp->getWindowHeight() - area.y2, area.getWidth(), area.getHeight(), GL_RGB, GL_UNSIGNED_BYTE, s.getData() );
+	glPixelStorei( GL_PACK_ALIGNMENT, oldPackAlignment );
+	ip::flipVertical( &s );
+	return s;
+}
 #endif // 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

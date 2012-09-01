@@ -22,28 +22,31 @@
 
 #pragma once
 
+#include "cinder/app/App.h"
 #include "cinder/app/Renderer.h"
 
 namespace cinder { namespace app {
 
-class App;
-class AppImplQtBasic;
-
-class AppImplQtRenderer {
+class AppImplQtRendererGl {
  public:
-	AppImplQtRenderer( App *aApp ) : mApp( aApp ) {}
+	AppImplQtRendererGl( App *aApp, RendererGl *aRenderer );
 	
-	//virtual bool	initialize( HWND wnd, HDC dc ) = 0;
-	virtual void	prepareToggleFullScreen() {}
-	virtual void	finishToggleFullScreen() {}
-	virtual void	kill() = 0;
-	virtual void	defaultResize() const = 0;
-	virtual void	swapBuffers() const = 0;
-	virtual void	makeCurrentContext() = 0;
+	virtual bool	initialize( HWND wnd, HDC dc );
+	virtual void	prepareToggleFullScreen();
+	virtual void	finishToggleFullScreen();
+	virtual void	kill();
+	virtual void	defaultResize() const;
+	virtual void	swapBuffers() const;
+	virtual void	makeCurrentContext();
 
  protected:
-	//HWND				mWnd;
-	App					*mApp;
+	//bool	initializeInternal( HWND wnd, HDC dc );
+	//int		initMultisample( PIXELFORMATDESCRIPTOR pfd, int requestedLevelIdx, HDC dc );
+	
+	RendererGl	*mRenderer;
+	bool		mWasFullScreen;
+	//HGLRC		mRC, mPrevRC;
+	//HDC			mDC;
 };
 
 } } // namespace cinder::app
