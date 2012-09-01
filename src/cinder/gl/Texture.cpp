@@ -129,6 +129,8 @@ Texture::Texture( const Surface32f &surface, Format format )
 	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #elif defined( CINDER_MSW )
 	bool supportsTextureFloat = GLEE_ARB_texture_float != 0;
+#elif defined( CINDER_LINUX )
+	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #endif
 
 	if( format.mInternalFormat < 0 ) {
@@ -183,6 +185,8 @@ Texture::Texture( const Channel32f &channel, Format format )
 	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #elif defined( CINDER_MSW )
 	bool supportsTextureFloat = GLEE_ARB_texture_float != 0;
+#elif defined( CINDER_LINUX )
+	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #endif
 
 	if( format.mInternalFormat < 0 ) {
@@ -314,6 +318,8 @@ void Texture::init( ImageSourceRef imageSource, const Format &format )
 	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #elif defined( CINDER_MSW )
 	bool supportsTextureFloat = GLEE_ARB_texture_float != 0;
+#elif defined( CINDER_LINUX )
+	bool supportsTextureFloat = gl::isExtensionAvailable( "GL_ARB_texture_float" );
 #endif
 	
 	// Set the internal format based on the image's color space
