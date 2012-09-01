@@ -123,6 +123,12 @@ class RendererGl : public Renderer {
 	virtual HWND	getHwnd() { return mWnd; }
 	virtual void	prepareToggleFullScreen();
 	virtual void	finishToggleFullScreen();
+#elif defined( CINDER_LINUX )
+	virtual void	setup( App *aApp/*, HWND wnd, HDC dc */);
+	virtual void	kill();
+	//virtual HWND	getHwnd() { return mWnd; }
+	virtual void	prepareToggleFullScreen();
+	virtual void	finishToggleFullScreen();
 #endif
 
 	enum	{ AA_NONE = 0, AA_MSAA_2, AA_MSAA_4, AA_MSAA_6, AA_MSAA_8, AA_MSAA_16, AA_MSAA_32 };
@@ -144,6 +150,8 @@ class RendererGl : public Renderer {
 #elif defined( CINDER_MSW )
 	class AppImplMswRendererGl	*mImpl;
 	HWND						mWnd;
+#elif defined( CINDER_LINUX )
+	class AppImplQtRendererGl *mImpl;
 #endif
 };
 

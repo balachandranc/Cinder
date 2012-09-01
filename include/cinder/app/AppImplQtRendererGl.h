@@ -31,7 +31,7 @@ class AppImplQtRendererGl {
  public:
 	AppImplQtRendererGl( App *aApp, RendererGl *aRenderer );
 	
-	virtual bool	initialize( HWND wnd, HDC dc );
+	virtual bool	initialize( /*HWND wnd, HDC dc*/ );
 	virtual void	prepareToggleFullScreen();
 	virtual void	finishToggleFullScreen();
 	virtual void	kill();
