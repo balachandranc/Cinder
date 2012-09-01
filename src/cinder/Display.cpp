@@ -142,7 +142,14 @@ void Display::enumerateDisplays()
 	
 	sDisplaysInitialized = true;
 }
-#endif // defined( CINDER_MSW )
+#elif defined( CINDER_LINUX )
+
+void Display::enumerateDisplays()
+{
+
+}
+
+#endif
 
 shared_ptr<Display> Display::getMainDisplay()
 {

@@ -12,5 +12,5 @@ add_library(cinder
 	Camera.cpp
 	Display.cpp
 	Triangulate.cpp
+	Area.cpp
 )
-target_link_libraries(cinder app gl)
