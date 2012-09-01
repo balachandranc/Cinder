@@ -33,7 +33,7 @@ set(CINDER_ROOT "/home/bchandra/workspace/Cinder")
 include_directories("${CINDER_ROOT}/include" "/usr/include/boost" "/usr/include")
 set(CINDER_LIB_DIR ${CINDER_ROOT}/build/cinder)
 set(CINDER_LIBRARIES 
-	${CINDER_LIB_DIR}/libcinder.a
+	#${CINDER_LIB_DIR}/libcinder.a
 	${CINDER_LIB_DIR}/app/libapp.a
 	)
 
