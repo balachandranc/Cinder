@@ -25,7 +25,11 @@
 using namespace std;
 
 #if defined( CINDER_MAC )
-#	include <Cocoa/Cocoa.h>
+	#include <Cocoa/Cocoa.h>
+#elif defined( CINDER_LINUX )
+	#include <QApplication>
+	#include <QDesktopWidget>
+	#include <QX11Info>
 #endif
 
 
@@ -146,7 +150,23 @@ void Display::enumerateDisplays()
 
 void Display::enumerateDisplays()
 {
+	if( sDisplaysInitialized )
+		return;
 
+	QDesktopWidget *desktopWidget = QApplication::desktop();
+	int screenCount = desktopWidget->screenCount();
+
+	for( int i = 0; i < screenCount; ++i ) {
+		shared_ptr<Display> newDisplay = shared_ptr<Display>( new Display );
+		QRect rect = desktopWidget->screenGeometry( i );
+		newDisplay->mArea = Area( rect.left(), rect.top(), rect.right(), rect.bottom() );
+		newDisplay->mScreen = desktopWidget->screen( i );
+		newDisplay->mBitsPerPixel = newDisplay->mScreen->x11Info().depth();
+
+		sDisplays.push_back( newDisplay );
+	}
+
+	sDisplaysInitialized = true;
 }
 
 #endif

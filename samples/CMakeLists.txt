@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8) 
 
 PROJECT(CinderSamples)
-SET(CMAKE_BUILD_TYPE release) 
+SET(CMAKE_BUILD_TYPE debug) 
 SET(CMAKE_C_COMPILER "/usr/bin/clang")
 SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 SET(CMAKE_LINKER  "/usr/bin/llvm-ld")

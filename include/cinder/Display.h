@@ -36,6 +36,8 @@
 	#include <windows.h>
 	#undef min
 	#undef max
+#elif defined( CINDER_LINUX )
+	#include <QWidget>
 #endif
 
 #include <map>
@@ -73,6 +75,8 @@ class Display {
 	CGDirectDisplayID	mDirectDisplayID;
 #elif defined( CINDER_MSW )
 	HMONITOR			mMonitor;
+#elif defined( CINDER_LINUX )
+	QWidget				*mScreen;
 #endif
 	
 	static void		enumerateDisplays();

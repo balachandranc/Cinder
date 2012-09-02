@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8) 
 
 PROJECT(Cinder)
-SET(CMAKE_BUILD_TYPE release) 
+SET(CMAKE_BUILD_TYPE debug) 
 
 add_definitions(-D_UNICODE)
 add_definitions(-DUNICODE)
