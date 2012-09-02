@@ -13,4 +13,12 @@ add_library(cinder
 	Display.cpp
 	Triangulate.cpp
 	Area.cpp
+	Path2d.cpp
+	BSpline.cpp
+	Exception.cpp
+	CinderMath.cpp
+	Rect.cpp
+	TriMesh.cpp
+	Stream.cpp
+	Utilities.cpp
 )

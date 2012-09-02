@@ -8,8 +8,9 @@ add_definitions(-D_UNICODE)
 add_definitions(-DUNICODE)
 add_definitions(-D__linux__) 
 
-find_package(GLUT)
-find_package(OpenGL)
+find_package(GLUT REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(Qt4 REQUIRED)
 
 #set(Boost_USE_STATIC_RUNTIME ON)
 
@@ -23,13 +24,13 @@ foreach(flag_var
 endforeach(flag_var)
 
 
-
 #incude cinder and boost header files and libraries.
 set(CINDER_ROOT "./")
 include_directories(
 	"${CINDER_ROOT}/../include" 
 	"/usr/include/boost"
 	"${CINDER_ROOT}/libtess2"
+	${QT_INCLUDES}
 )
 
 add_subdirectory(cinder)

@@ -41,11 +41,16 @@
 	#import <Foundation/NSFileManager.h>
 	#include <cxxabi.h>
 	#include <execinfo.h>
-#else
+#elif defined( CINDER_MSW )
 	#include <windows.h>
 	#include <Shlwapi.h>
 	#include <shlobj.h>
 	#include "cinder/msw/StackWalker.h"
+#elif defined( CINDER_LINUX )
+	#include <QFileInfo>
+	#include <QDir>
+	#include <QUrl>
+	#include <QDesktopServices>
 #endif
 
 #include <vector>
@@ -64,10 +69,13 @@ fs::path expandPath( const fs::path &path )
 	NSString *pathNS = [NSString stringWithCString:path.c_str() encoding:NSUTF8StringEncoding];
 	NSString *resultPath = [pathNS stringByStandardizingPath];
 	result = string( [resultPath cStringUsingEncoding:NSUTF8StringEncoding] );
-#else
+#elif defined( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::PathCanonicalizeA( buffer, path.string().c_str() );
 	result = buffer; 
+#elif defined( CINDER_LINUX )
+	QFileInfo fileInfo = QFileInfo( QString( path.string().c_str() ));
+	result = fileInfo.canonicalFilePath().toAscii().constData();
 #endif
 
 	return fs::path( result );
@@ -81,11 +89,13 @@ std::string getHomeDirectory()
 	NSString *home = ::NSHomeDirectory();
 	result = [home cStringUsingEncoding:NSUTF8StringEncoding];
 	result += "/";
-#else
+#elif defined( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::SHGetFolderPathA( 0, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, buffer );
 	result = buffer;
 	result += "\\";
+#elif defined( CINDER_LINUX )
+	result = QDir::homePath().toAscii().constData();
 #endif
 
 	return result;
@@ -99,11 +109,13 @@ std::string getDocumentsDirectory()
 	NSArray *arrayPaths = ::NSSearchPathForDirectoriesInDomains( NSDocumentDirectory, NSUserDomainMask, YES );
 	NSString *docDir = [arrayPaths objectAtIndex:0];
 	return cocoa::convertNsString( docDir ) + "/";
-#else
+#elif defined ( CINDER_MSW )
 	char buffer[MAX_PATH];
 	::SHGetFolderPathA( 0, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, buffer );
 	result = buffer;
 	result += "\\";
+#elif defined ( CINDER_LINUX )
+	result = QDir::home().absoluteFilePath( QString("Documents") ).toAscii().constData();
 #endif
 
 	return result;
@@ -114,7 +126,7 @@ std::string getTemporaryDirectory()
 #if defined( CINDER_COCOA )
 	NSString *docDir = ::NSTemporaryDirectory();
 	return cocoa::convertNsString( docDir );
-#else
+#elif defined( CINDER_MSW )
 	DWORD result = ::GetTempPathW( 0, L"" );
 	if( ! result )
 		throw std::runtime_error("Could not get system temp path");
@@ -126,6 +138,8 @@ std::string getTemporaryDirectory()
 
 	std::wstring wideResult( tempPath.begin(), tempPath.begin() + static_cast<std::size_t>(result) );
 	return toUtf8( wideResult );
+#elif defined( CINDER_LINUX )
+	return QDir::tempPath().toAscii().constData();
 #endif
 }
 
@@ -135,7 +149,7 @@ std::string getTemporaryFilePath( const std::string &prefix )
 	char path[2048];
 	sprintf( path, "%s%sXXXXXX", getTemporaryDirectory().c_str(), prefix.c_str() );
 	return string( mktemp( path ) );
-#else
+#elif defined( CINDER_MSW )
 	TCHAR tempFileName[MAX_PATH]; 
 	DWORD result = ::GetTempPathW( 0, L"" );
 	if( ! result )
@@ -151,6 +165,8 @@ std::string getTemporaryFilePath( const std::string &prefix )
 		throw std::runtime_error( "Could not create temporary file path" );
 
 	return toUtf8( tempFileName );
+#elif defined( CINDER_LINUX )
+	return QDir::temp().absoluteFilePath( QString( prefix.c_str() )).toAscii().constData();
 #endif
 }
 
@@ -196,8 +212,10 @@ bool createDirectories( const fs::path &path, bool createParents )
 #if defined( CINDER_COCOA )
 	NSString *pathNS = [NSString stringWithCString:dirPath.c_str() encoding:NSUTF8StringEncoding];
 	return static_cast<bool>( [[NSFileManager defaultManager] createDirectoryAtPath:pathNS withIntermediateDirectories:YES attributes:nil error:nil] );
-#else
+#elif defined( CINDER_MSW )
 	return ::SHCreateDirectoryExA( NULL, dirPath.string().c_str(), NULL ) == ERROR_SUCCESS;
+#elif defined( CINDER_LINUX )
+	return QDir().mkpath( QString( dirPath.c_str() ));
 #endif
 }
 
@@ -208,6 +226,8 @@ void launchWebBrowser( const Url &url )
 	NSURL *nsUrl = [NSURL URLWithString:nsString];
 #elif defined( CINDER_MSW )
 	wstring urlStr = toUtf16( url.str() );
+#elif defined( CINDER_LINUX )
+	QString urlStr = QString( url.str().c_str() );
 #endif
 
 #if defined( CINDER_COCOA_TOUCH )
@@ -216,6 +236,8 @@ void launchWebBrowser( const Url &url )
 	[[NSWorkspace sharedWorkspace] openURL:nsUrl ];
 #elif defined( CINDER_MSW )
 	ShellExecute( NULL, L"open", urlStr.c_str(), NULL, NULL, SW_SHOWNORMAL );
+#elif defined( CINDER_LINUX )
+	QDesktopServices::openUrl( QUrl( urlStr ));
 #endif
 }
 
@@ -223,10 +245,12 @@ void deleteFile( const fs::path &path )
 {
 #if defined( CINDER_COCOA )
 	unlink( path.c_str() );
-#else
+#elif defined( CINDER_MSW )
 	if( ! ::DeleteFileW( toUtf16( path.string() ).c_str() ) ) {
 		DWORD err = GetLastError();
 	}
+#elif defined( CINDER_LINUX )
+	QDir().remove( path.string().c_str() );
 #endif
 }
 
@@ -264,6 +288,12 @@ wstring toUtf16( const string &utf8 )
 	}
 
 	return wstring( &resultString[0] );
+
+#elif defined( CINDER_LINUX )
+	QString qString = QString::fromUtf8( utf8.c_str() );
+	wchar_t *array = new wchar_t[ qString.length() ];
+	qString.toWCharArray( array );
+	return wstring( array );
 #else
 	NSString *utf8NS = [NSString stringWithCString:utf8.c_str() encoding:NSUTF8StringEncoding];
 	return wstring( reinterpret_cast<const wchar_t*>( [utf8NS cStringUsingEncoding:NSUTF16LittleEndianStringEncoding] ) );
@@ -287,6 +317,8 @@ string toUtf8( const wstring &utf16 )
 	}
 
 	return string( &resultString[0] );
+#elif defined( CINDER_LINUX )
+	return QString::fromWCharArray( utf16.c_str() ).toAscii().constData();
 #else
 	NSString *utf16NS = [NSString stringWithCString:reinterpret_cast<const char*>( utf16.c_str() ) encoding:NSUTF16LittleEndianStringEncoding];
 	return string( [utf16NS cStringUsingEncoding:NSUTF8StringEncoding] );	
@@ -297,6 +329,8 @@ void sleep( float milliseconds )
 {
 #if defined( CINDER_MSW )
 	::Sleep( static_cast<int>( milliseconds ) );
+#elif defined( CINDER_LINUX )
+	//XXX: unimplemented
 #else
 	useconds_t microsecs = milliseconds * 1000;
 	::usleep( microsecs );
@@ -350,6 +384,9 @@ vector<string> stackTrace()
 #if defined( CINDER_MSW )
 	CinderStackWalker csw;
 	return csw.getEntries();
+#elif defined( CINDER_LINUX )
+	//TODO: implement stack trace
+	return vector<string>();
 #else
 	std::vector<std::string> result;
 	static const int MAX_DEPTH = 128;
