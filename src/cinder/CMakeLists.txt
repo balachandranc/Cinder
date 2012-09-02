@@ -27,4 +27,6 @@ add_library(cinder
 	UrlImplCurl.cpp
 	AxisAlignedBox.cpp
 	Ray.cpp
+	ImageIo.cpp
+	DataTarget.cpp
 )
