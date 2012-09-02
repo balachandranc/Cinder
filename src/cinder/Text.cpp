@@ -454,7 +454,7 @@ Surface renderStringPow2( const string &str, const Font &font, const ColorA &col
 	::CGContextRelease( cgContext );
 	return result;
 }
-#elif defined( CINDER_MAC) || defined( CINDER_MSW )
+#elif defined( CINDER_MAC) || defined( CINDER_MSW ) || defined( CINDER_LINUX )
 Surface renderString( const string &str, const Font &font, const ColorA &color, float *baselineOffset )
 {
 	Line line;
@@ -509,7 +509,10 @@ Surface renderString( const string &str, const Font &font, const ColorA &color, 
 	::GdiFlush();
 
 	delete offscreenBitmap;
-	delete offscreenGraphics;		
+	delete offscreenGraphics;
+#elif defined( CINDER_LINUX )
+	//TODO: implement for Qt
+	Surface result( pixelWidth, pixelHeight, true, SurfaceChannelOrder::RGBA );
 #endif	
 
 	if( baselineOffset )

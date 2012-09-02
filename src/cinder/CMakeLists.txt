@@ -1,5 +1,6 @@
 add_subdirectory(app)
 add_subdirectory(gl)
+add_subdirectory(ip)
 include_directories(${CINDER_INCLUDE_DIRS})
 message(" my message ${CINDER_INCLUDE_DIRS}")
 
@@ -30,4 +31,5 @@ add_library(cinder
 	ImageIo.cpp
 	DataTarget.cpp
 	Font.cpp
+	Text.cpp
 )
