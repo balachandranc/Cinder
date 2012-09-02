@@ -21,6 +21,8 @@ endif()
 
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(Qt4 REQUIRED) 
+include(${QT_USE_FILE})
 
 if (${OPENGL_FOUND})
 	message("The opengl libs: ${OPENGL_LIBRARIES}")
