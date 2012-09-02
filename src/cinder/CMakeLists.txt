@@ -29,4 +29,5 @@ add_library(cinder
 	Ray.cpp
 	ImageIo.cpp
 	DataTarget.cpp
+	Font.cpp
 )
