@@ -34,4 +34,5 @@ add_library(cinder
 	Text.cpp
 	Surface.cpp
 	Channel.cpp
+	Timer.cpp
 )
