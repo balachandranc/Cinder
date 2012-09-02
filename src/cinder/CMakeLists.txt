@@ -32,4 +32,6 @@ add_library(cinder
 	DataTarget.cpp
 	Font.cpp
 	Text.cpp
+	Surface.cpp
+	Channel.cpp
 )

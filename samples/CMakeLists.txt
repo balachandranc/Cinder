@@ -44,8 +44,8 @@ set(CINDER_LIB_DIR ${CINDER_ROOT}/build/cinder)
 set(CINDER_LIBRARIES
 	${CINDER_LIB_DIR}/app/libapp.a
 	${CINDER_LIB_DIR}/gl/libgl.a
-	${CINDER_LIB_DIR}/ip/libip.a
 	${CINDER_LIB_DIR}/libcinder.a
+	${CINDER_LIB_DIR}/ip/libip.a
 	${CINDER_LIB_DIR}/../libtess2/libtess2.a 
 	)
 
