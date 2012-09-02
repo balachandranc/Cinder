@@ -25,4 +25,6 @@ add_library(cinder
 	DataSource.cpp
 	Url.cpp
 	UrlImplCurl.cpp
+	AxisAlignedBox.cpp
+	Ray.cpp
 )
