@@ -21,4 +21,8 @@ add_library(cinder
 	TriMesh.cpp
 	Stream.cpp
 	Utilities.cpp
+	Buffer.cpp
+	DataSource.cpp
+	Url.cpp
+	UrlImplCurl.cpp
 )

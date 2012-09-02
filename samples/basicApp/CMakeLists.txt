@@ -6,4 +6,5 @@ target_link_libraries(basicApp
 	${OPENGL_LIBRARIES}
 	${CINDER_LIBRARIES}
 	${QT_LIBRARIES}
+	${CURL_LIBRARIES}
 	)
