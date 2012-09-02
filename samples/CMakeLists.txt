@@ -4,7 +4,7 @@ PROJECT(CinderSamples)
 SET(CMAKE_BUILD_TYPE release) 
 SET(CMAKE_C_COMPILER "/usr/bin/clang")
 SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-SET (CMAKE_LINKER  "/usr/bin/llvm-ld")
+SET(CMAKE_LINKER  "/usr/bin/llvm-ld")
 
 add_definitions(-D_UNICODE)
 add_definitions(-DUNICODE)
