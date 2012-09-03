@@ -127,6 +127,8 @@ int AppBasic::getWindowWidth() const
 	return [mImpl getWindowWidth];
 #elif defined( CINDER_MSW )
 	return mImpl->getWindowWidth();
+#elif defined( CINDER_LINUX )
+	return mImpl->getWindowWidth();
 #endif
 }
 
@@ -135,6 +137,8 @@ int AppBasic::getWindowHeight() const
 #if defined( CINDER_COCOA )
 	return [mImpl getWindowHeight];
 #elif defined( CINDER_MSW )
+	return mImpl->getWindowHeight();
+#elif defined( CINDER_LINUX )
 	return mImpl->getWindowHeight();
 #endif
 }
@@ -145,6 +149,8 @@ void AppBasic::setWindowWidth( int windowWidth )
 	[mImpl setWindowWidth:windowWidth];
 #elif defined( CINDER_MSW )
 	mImpl->setWindowWidth( windowWidth );
+#elif defined( CINDER_LINUX )
+	mImpl->setWindowWidth( windowWidth );
 #endif
 }
 
@@ -153,6 +159,8 @@ void AppBasic::setWindowHeight( int windowHeight )
 #if defined( CINDER_COCOA )
 	[mImpl setWindowHeight:windowHeight];
 #elif defined( CINDER_MSW )
+	mImpl->setWindowHeight( windowHeight );
+#elif defined( CINDER_LINUX )
 	mImpl->setWindowHeight( windowHeight );
 #endif
 }
@@ -174,6 +182,8 @@ float AppBasic::getFrameRate() const
 	return [mImpl getFrameRate];
 #elif defined( CINDER_MSW )
 	return mImpl->getFrameRate();
+#elif defined( CINDER_LINUX )
+	return mImpl->getFrameRate();
 #endif
 }
 
@@ -183,6 +193,8 @@ void AppBasic::setFrameRate( float aFrameRate )
 	[mImpl setFrameRate:aFrameRate];
 #elif defined( CINDER_MSW )
 	mImpl->setFrameRate( aFrameRate );
+#elif defined( CINDER_LINUX )
+	mImpl->setFrameRate( aFrameRate );
 #endif
 }
 
@@ -191,6 +203,8 @@ bool AppBasic::isFullScreen() const
 #if defined( CINDER_COCOA )
 	return [mImpl isFullScreen];
 #elif defined( CINDER_MSW )
+	return mImpl->isFullScreen();
+#elif defined( CINDER_LINUX )
 	return mImpl->isFullScreen();
 #endif
 }
@@ -216,6 +230,8 @@ Vec2i AppBasic::getMousePos() const
 	return Vec2i( (int)p.x, getWindowHeight() - (int)p.y );
 #elif defined( CINDER_MSW )
 	return mImpl->mouseLocation();
+#elif defined( CINDER_LINUX )
+	return mImpl->mouseLocation();
 #else
 	return Vec2i( -1, -1 );
 #endif
@@ -227,6 +243,8 @@ fs::path AppBasic::getAppPath()
 	return [mImpl getAppPath];
 #elif defined( CINDER_MSW )
 	return AppImplMsw::getAppPath();
+#elif defined( CINDER_LINUX )
+	return AppImplQt::getAppPath();
 #endif
 }
 
@@ -236,6 +254,8 @@ void AppBasic::hideCursor()
 	[NSCursor hide];
 #elif defined( CINDER_MSW )
 	AppImplMsw::hideCursor();
+#elif defined( CINDER_LINUX )
+	AppImplQt::hideCursor();
 #endif
 }
 
@@ -245,6 +265,8 @@ void AppBasic::showCursor()
 	[NSCursor unhide];
 #elif defined( CINDER_MSW )
 	AppImplMsw::showCursor();
+#elif defined( CINDER_LINUX )
+	AppImplQt::showCursor();
 #endif
 }
 

@@ -110,7 +110,7 @@ void AppImplQtBasic::run()
 	timer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
-	sQApp->installEventFilter( new QtEventHandler( getApp() ) );
+	mWindow->installEventFilter( new QtEventHandler( getApp() ) );
 	mWindow->setFocus();
 
 	sQApp->exec();
@@ -230,17 +230,31 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 	QDesktopWidget *desktopWidget = QApplication::desktop();
 	QRect rect = desktopWidget->screenGeometry( -1 );
 
-	if( !mFullScreen ) { // center the window on the display if windowed
-		rect.setLeft ( ( getDisplay()->getWidth() - rect.width() ) / 2 );
-		rect.setTop ( ( getDisplay()->getHeight() - rect.height() ) / 2 );
+	if( *width <= 0 ) {
+		*width = rect.width();
+		*height = rect.height();
 	}
 
-	mWindow = new QGLWidget( NULL, NULL, Qt::FramelessWindowHint );
-	mWindow->resize( rect.width(), rect.height() );
+	if( mFullScreen ) {
+		rect.setLeft( 0 );
+		rect.setRight( *width );
+		rect.setTop( 0 );
+		rect.setBottom( *height );
+	} else { // center the window on the display if windowed
+		rect.setLeft( ( getDisplay()->getWidth() - *width ) / 2 );
+		rect.setRight( ( getDisplay()->getWidth() - *width ) / 2 + *width );
+		rect.setTop( ( getDisplay()->getHeight() - *height ) / 2 );
+		rect.setBottom( ( getDisplay()->getHeight() - *height ) / 2 + *height );
+	}
+
+	mWindow = new QGLWidget( /*NULL, NULL, Qt::FramelessWindowHint*/ );
+	mWindow->setGeometry( rect );
 	mWindow->show();
 	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
 
 	mApp->getRenderer()->setup( mApp, mWindow );
+
+	enableMultiTouch();
 
 	return true;
 }
@@ -266,6 +280,7 @@ void AppImplQtBasic::killWindow( bool wasFullScreen )
 
 	mWnd = 0;
 	*/
+	delete mWindow;
 }
 
 void AppImplQtBasic::toggleFullScreen()

@@ -37,9 +37,7 @@ void BasicApp::keyDown( KeyEvent event )
 
 void BasicApp::draw()
 {
-	Vec2i v = Vec2i (1024, 768);
-
-	gl::setMatricesWindow( v );
+	gl::setMatricesWindow( getWindowSize() );
 	// this pair of lines is the standard way to clear the screen in OpenGL
 	gl::clear( Color( 0.1f, 0.1f, 0.1f ) );
 
