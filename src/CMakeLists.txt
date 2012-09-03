@@ -10,7 +10,9 @@ add_definitions(-D__linux__)
 
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(Qt4 REQUIRED)
+find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL)
+
+include(${QT_USE_FILE})
 
 #set(Boost_USE_STATIC_RUNTIME ON)
 

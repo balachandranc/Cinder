@@ -25,13 +25,14 @@
 #include "cinder/app/App.h"
 #include "cinder/Camera.h"
 
+
 namespace cinder { namespace app {
 
 bool sMultisampleSupported = false;
 int sArbMultisampleFormat;
 
-AppImplQtRendererGl::AppImplQtRendererGl( App *aApp, RendererGl *aRenderer )
-	: mApp( aApp ), mRenderer( aRenderer )
+AppImplQtRendererGl::AppImplQtRendererGl( App *aApp, RendererGl *aRenderer, QGLWidget *aGLWidget )
+	: mApp( aApp ), mRenderer( aRenderer ), mGLWidget( aGLWidget )
 {
 	//mPrevRC = 0;
 	//mRC = 0;
@@ -73,6 +74,7 @@ void AppImplQtRendererGl::swapBuffers() const
 void AppImplQtRendererGl::makeCurrentContext()
 {
 	//::wglMakeCurrent( mDC, mRC );
+	mGLWidget->makeCurrent();
 }
 
 /*

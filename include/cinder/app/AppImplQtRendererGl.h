@@ -25,11 +25,13 @@
 #include "cinder/app/App.h"
 #include "cinder/app/Renderer.h"
 
+#include <QGLWidget>
+
 namespace cinder { namespace app {
 
 class AppImplQtRendererGl {
  public:
-	AppImplQtRendererGl( App *aApp, RendererGl *aRenderer );
+	AppImplQtRendererGl( App *aApp, RendererGl *aRenderer, QGLWidget *aGLWidget );
 	
 	virtual bool	initialize( /*HWND wnd, HDC dc*/ );
 	virtual void	prepareToggleFullScreen();
@@ -45,6 +47,7 @@ class AppImplQtRendererGl {
 	
 	RendererGl	*mRenderer;
 	bool		mWasFullScreen;
+	QGLWidget	*mGLWidget;
 	//HGLRC		mRC, mPrevRC;
 	//HDC			mDC;
 	App			*mApp;

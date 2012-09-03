@@ -28,7 +28,9 @@
 
 #include <QRect>
 #include <QDesktopWidget>
-#include <QWidget>
+#include <QGLWidget>
+#include <QTimer>
+#include <QTime>
 
 using std::vector;
 using std::string;
@@ -99,6 +101,10 @@ void AppImplQtBasic::run()
 			::Sleep( 0 );
 	}
 	 */
+
+	QTimer *timer = new QTimer();
+	connect ( timer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
+	timer->start(300);
 
 	sQApp->exec();
 
@@ -216,12 +222,13 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 		rect.setTop ( ( getDisplay()->getHeight() - rect.height() ) / 2 );
 	}
 
-	mWindow = new QWidget();
+	mWindow = new QGLWidget();
+	mWindow->makeCurrent();
 	mWindow->resize( rect.width(), rect.height() );
 	mWindow->show();
 	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
 
-	mApp->getRenderer()->setup( mApp );
+	mApp->getRenderer()->setup( mApp, mWindow );
 
 	return true;
 }
@@ -318,6 +325,7 @@ void AppImplQtBasic::setWindowWidth( int aWindowWidth )
 	int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, mApp->getWindowHeight(), &screenWidth, &screenHeight );
 	//::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	mWindow->resize( screenWidth, screenHeight );
 }
 
 void AppImplQtBasic::setWindowHeight( int aWindowHeight )
@@ -325,6 +333,7 @@ void AppImplQtBasic::setWindowHeight( int aWindowHeight )
 	int screenWidth, screenHeight;
 	getScreenSize( mApp->getWindowWidth(), aWindowHeight, &screenWidth, &screenHeight );
 	//::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	mWindow->resize( screenWidth, screenHeight );
 }
 
 void AppImplQtBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
@@ -332,6 +341,7 @@ void AppImplQtBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
 	int screenWidth, screenHeight;
 	getScreenSize( aWindowWidth, aWindowHeight, &screenWidth, &screenHeight );
 	//::SetWindowPos( mWnd, HWND_TOP, 0, 0, screenWidth, screenHeight, SWP_NOMOVE );
+	mWindow->resize( screenWidth, screenHeight );
 }
 
 float AppImplQtBasic::setFrameRate( float aFrameRate )
@@ -350,6 +360,21 @@ void AppImplQtBasic::getScreenSize( int clientWidth, int clientHeight, int *resu
 	*resultWidth = windowRect.right - windowRect.left;
 	*resultHeight = windowRect.bottom - windowRect.top;
 	*/
+
+	//XXX: dummy implementation
+	*resultWidth = clientWidth;
+	*resultHeight = clientHeight;
+}
+
+void AppImplQtBasic::paint()
+{
+
+	std::cout << QTime::currentTime().msec() << std::endl;
+	std::cout.flush();
+
+	mApp->getRenderer()->startDraw();
+	mApp->draw();
+	mApp->getRenderer()->finishDraw();
 }
 
 /*

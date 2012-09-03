@@ -245,12 +245,12 @@ RendererGl::~RendererGl()
 	delete mImpl;
 }
 
-void RendererGl::setup( App *aApp/*, HWND wnd, HDC dc */)
+void RendererGl::setup( App *aApp, QGLWidget *aGLWidget /*, HWND wnd, HDC dc */)
 {
 	//mWnd = wnd;
 	mApp = aApp;
 	if( ! mImpl )
-		mImpl = new AppImplQtRendererGl( mApp, this );
+		mImpl = new AppImplQtRendererGl( mApp, this, aGLWidget );
 	mImpl->initialize( /*wnd, dc */);
 }
 

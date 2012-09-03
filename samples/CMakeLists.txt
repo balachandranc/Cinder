@@ -21,9 +21,12 @@ endif()
 
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(Qt4 REQUIRED) 
+find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL) 
 include(${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
 find_package(CURL)
+
+message("Qt Definitions: ${QT_DEFINITIONS}")
 
 if (${OPENGL_FOUND})
 	message("The opengl libs: ${OPENGL_LIBRARIES}")

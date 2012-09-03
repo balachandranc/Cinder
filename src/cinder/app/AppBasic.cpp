@@ -163,6 +163,8 @@ void AppBasic::setWindowSize( int windowWidth, int windowHeight )
 	[mImpl setWindowSizeWithWidth:windowWidth height:windowHeight];
 #elif defined( CINDER_MSW )
 	mImpl->setWindowSize( windowWidth, windowHeight );
+#elif defined( CINDER_LINUX )
+	mImpl->setWindowSize( windowWidth, windowHeight );
 #endif
 }
 

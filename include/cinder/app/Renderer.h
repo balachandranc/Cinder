@@ -49,6 +49,8 @@
 		class AppImplCocoaTouchRendererQuartz;
 		class UIView;
 	#endif
+#elif defined( CINDER_LINUX )
+	#include <QGLWidget>
 #endif
 
 
@@ -83,7 +85,7 @@ class Renderer {
 	virtual HWND				getHwnd() = 0;
 	virtual HDC					getDc() { throw; } // the default behavior is failure
 #elif defined( CINDER_LINUX )
-	virtual void setup( App *aApp) = 0;
+	virtual void setup( App *aApp, QGLWidget *aGLWidget ) = 0;
 
 	virtual void prepareToggleFullScreen() {}
 	virtual void finishToggleFullScreen() {}
@@ -124,7 +126,7 @@ class RendererGl : public Renderer {
 	virtual void	prepareToggleFullScreen();
 	virtual void	finishToggleFullScreen();
 #elif defined( CINDER_LINUX )
-	virtual void	setup( App *aApp/*, HWND wnd, HDC dc */);
+	virtual void	setup( App *aApp, QGLWidget *aGLWidget /*, HWND wnd, HDC dc */);
 	virtual void	kill();
 	//virtual HWND	getHwnd() { return mWnd; }
 	virtual void	prepareToggleFullScreen();

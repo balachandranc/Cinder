@@ -37,7 +37,9 @@ void BasicApp::keyDown( KeyEvent event )
 
 void BasicApp::draw()
 {
-	gl::setMatricesWindow( getWindowSize() );
+	Vec2i v = Vec2i (1024, 768);
+
+	gl::setMatricesWindow( v );
 	// this pair of lines is the standard way to clear the screen in OpenGL
 	gl::clear( Color( 0.1f, 0.1f, 0.1f ) );
 
@@ -50,6 +52,8 @@ void BasicApp::draw()
 	for( list<Vec2f>::iterator pointIter = mPoints.begin(); pointIter != mPoints.end(); ++pointIter ) {
 		float x = (*pointIter)[0];
 		float y = (*pointIter)[1];
+		std::cout<<"x: "<<x<<" y: "<<y<<endl;
+		std::cout.flush();
 		glVertex2f( x, y );
 	}
 	// tell OpenGL to actually draw the lines now

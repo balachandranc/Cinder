@@ -26,11 +26,14 @@
 //#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/Display.h"
 
-#include <QWidget>
+#include <QGLWidget>
+#include <QObject>
 
 namespace cinder { namespace app {
 
-class AppImplQtBasic : public AppImplQt {
+class AppImplQtBasic : public QObject, public AppImplQt {
+	Q_OBJECT
+
  public:
 	AppImplQtBasic( class AppBasic *aApp  );
 	void	run();
@@ -49,6 +52,9 @@ class AppImplQtBasic : public AppImplQt {
 	
 	Display*	getDisplay() { return mDisplay; }
 	
+ public slots:
+	void		paint();
+
  protected:
 	bool		createWindow( int *width, int *height );
 	void		killWindow( bool wasFullScreen );
@@ -70,7 +76,7 @@ class AppImplQtBasic : public AppImplQt {
 	*/
 	double					mNextFrameTime;
 	Display					*mDisplay;
-	QWidget					*mWindow;
+	QGLWidget					*mWindow;
 	/*
 	std::map<DWORD,Vec2f>	mMultiTouchPrev;
 
