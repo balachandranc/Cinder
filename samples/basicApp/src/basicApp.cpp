@@ -52,8 +52,6 @@ void BasicApp::draw()
 	for( list<Vec2f>::iterator pointIter = mPoints.begin(); pointIter != mPoints.end(); ++pointIter ) {
 		float x = (*pointIter)[0];
 		float y = (*pointIter)[1];
-		std::cout<<"x: "<<x<<" y: "<<y<<endl;
-		std::cout.flush();
 		glVertex2f( x, y );
 	}
 	// tell OpenGL to actually draw the lines now

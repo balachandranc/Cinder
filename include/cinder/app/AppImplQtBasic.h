@@ -28,8 +28,23 @@
 
 #include <QGLWidget>
 #include <QObject>
+#include <QEvent>
 
 namespace cinder { namespace app {
+
+class QtEventHandler: public QObject
+{
+public:
+	QtEventHandler( class App *aApp);
+	~QtEventHandler()
+	{};
+
+	bool eventFilter( QObject *obj, QEvent *event );
+
+private:
+	App 		*mApp;
+};
+
 
 class AppImplQtBasic : public QObject, public AppImplQt {
 	Q_OBJECT
@@ -51,6 +66,7 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 	std::string getAppPath() const;
 	
 	Display*	getDisplay() { return mDisplay; }
+	bool		eventFilter( QObject *obj, QEvent *event );
 	
  public slots:
 	void		paint();

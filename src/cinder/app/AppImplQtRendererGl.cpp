@@ -69,6 +69,7 @@ void AppImplQtRendererGl::defaultResize() const
 void AppImplQtRendererGl::swapBuffers() const
 {
 	//::SwapBuffers( mDC );
+	mGLWidget->swapBuffers();
 }
 
 void AppImplQtRendererGl::makeCurrentContext()

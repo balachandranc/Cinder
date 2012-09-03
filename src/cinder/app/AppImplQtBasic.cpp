@@ -29,8 +29,10 @@
 #include <QRect>
 #include <QDesktopWidget>
 #include <QGLWidget>
+#include <QMainWindow>
 #include <QTimer>
 #include <QTime>
+#include <QMouseEvent>
 
 using std::vector;
 using std::string;
@@ -44,7 +46,7 @@ namespace cinder { namespace app {
 //static const wchar_t *FULLSCREEN_WIN_CLASS_NAME = TEXT("CinderWinFSClass");
 
 AppImplQtBasic::AppImplQtBasic( AppBasic *aApp )
-	: AppImplQt( aApp ), mApp( aApp ), mHasBeenInitialized( false )
+	: QObject(), AppImplQt( aApp ), mApp( aApp ), mHasBeenInitialized( false )
 {
 	mShouldQuit = false;
 	mIsDragging = false;
@@ -104,7 +106,11 @@ void AppImplQtBasic::run()
 
 	QTimer *timer = new QTimer();
 	connect ( timer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
-	timer->start(300);
+	timer->start(30);
+
+	mWindow->setFocusPolicy( Qt::StrongFocus );
+	sQApp->installEventFilter( new QtEventHandler( getApp() ) );
+	mWindow->setFocus();
 
 	sQApp->exec();
 
@@ -223,7 +229,6 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 	}
 
 	mWindow = new QGLWidget();
-	mWindow->makeCurrent();
 	mWindow->resize( rect.width(), rect.height() );
 	mWindow->show();
 	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
@@ -366,6 +371,21 @@ void AppImplQtBasic::getScreenSize( int clientWidth, int clientHeight, int *resu
 	*resultHeight = clientHeight;
 }
 
+bool AppImplQtBasic::eventFilter( QObject *obj, QEvent *event )
+{
+	std::cout << "Event" << std::endl;
+	std::cout.flush();
+
+	if( event->type() == QEvent::DragMove ) {
+
+	}
+
+	std::cout << event->type() << std::endl;
+	std::cout.flush();
+
+	return false;
+}
+
 void AppImplQtBasic::paint()
 {
 
@@ -447,6 +467,25 @@ void AppImplQtBasic::onTouch( HWND hWnd, WPARAM wParam, LPARAM lParam )
     }
 }
 */
+
+unsigned int prepMouseEventModifiers( QMouseEvent *event )
+{
+	unsigned int result = 0;
+
+	Qt::MouseButtons buttons = event->buttons();
+	Qt::KeyboardModifiers modifiers = event->modifiers();
+
+	if( modifiers & Qt::ControlModifier ) result |= MouseEvent::CTRL_DOWN;
+	if( buttons & Qt::LeftButton ) result |= MouseEvent::LEFT_DOWN;
+	if( buttons & Qt::MidButton ) result |= MouseEvent::MIDDLE_DOWN;
+	if( buttons & Qt::RightButton ) result |= MouseEvent::RIGHT_DOWN;
+	if( modifiers & Qt::ShiftModifier ) result |= MouseEvent::SHIFT_DOWN;
+	if( modifiers & Qt::AltModifier ) result |= MouseEvent::ALT_DOWN;
+	if( modifiers & Qt::MetaModifier ) result |= MouseEvent::META_DOWN;
+
+	return result;
+}
+
 /*
 unsigned int prepMouseEventModifiers( WPARAM wParam )
 {
@@ -656,4 +695,28 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 }
 } // extern "C"
 */
+
+QtEventHandler::QtEventHandler( App *aApp ): QObject(), mApp( aApp )
+{
+
+}
+
+bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
+{
+	switch( event-> type() ) {
+	case QEvent::MouseMove:
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );
+		QPoint pos = mouseEvent->pos();
+		if( mouseEvent->buttons() ) {
+			mApp->privateMouseDrag__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+								0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+		} else {
+
+		}
+		break;
+	}
+
+	return false;
+}
+
 } } // namespace cinder::app
