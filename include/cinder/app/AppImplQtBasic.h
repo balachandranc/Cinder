@@ -52,10 +52,10 @@ class AppImplQtBasic : public QObject, public AppImplQt {
  public:
 	AppImplQtBasic( class AppBasic *aApp  );
 	void	run();
+	void	quit();
 
 	class AppBasic*		getApp() { return mApp; }
 	
-	void	quit() { mShouldQuit = true; }
 	
 	void	setWindowWidth( int aWindowWidth );
 	void	setWindowHeight( int aWindowHeight );

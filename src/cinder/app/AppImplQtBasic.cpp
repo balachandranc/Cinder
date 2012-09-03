@@ -119,6 +119,12 @@ void AppImplQtBasic::run()
 	delete mApp;
 }
 
+void AppImplQtBasic::quit()
+{
+	 mShouldQuit = true;
+	 qApp->quit();
+}
+
 bool AppImplQtBasic::createWindow( int *width, int *height )
 {
 	/*
@@ -228,7 +234,7 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 		rect.setTop ( ( getDisplay()->getHeight() - rect.height() ) / 2 );
 	}
 
-	mWindow = new QGLWidget();
+	mWindow = new QGLWidget( NULL, NULL, Qt::FramelessWindowHint );
 	mWindow->resize( rect.width(), rect.height() );
 	mWindow->show();
 	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
