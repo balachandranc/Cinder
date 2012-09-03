@@ -462,6 +462,8 @@ void App::prepareLaunch()
 {
 #if defined( CINDER_COCOA )
     sAutoReleasePool = [[NSAutoreleasePool alloc] init];
+#elif defined( CINDER_LINUX )
+    AppImplQt::prepareLaunch();
 #endif
 }
 

@@ -24,12 +24,16 @@
 #include "cinder/app/App.h"
 #include "cinder/Utilities.h"
 
+#include <QApplication>
+
 using std::string;
 using std::wstring;
 using std::vector;
 using std::pair;
 
 namespace cinder { namespace app {
+
+QApplication* AppImplQt::sQApp;
 
 AppImplQt::AppImplQt( App *aApp )
 	: mApp( aApp ), mWindowOffset( 0, 0 )
@@ -302,6 +306,13 @@ fs::path AppImplQt::getSaveFilePath( const fs::path &initialPath, vector<string>
 
 	return result;
 	*/
+}
+
+void AppImplQt::prepareLaunch()
+{
+	int argc = 0;
+	char **argv;
+	sQApp = new QApplication( argc, argv );
 }
 
 } } // namespace cinder::app

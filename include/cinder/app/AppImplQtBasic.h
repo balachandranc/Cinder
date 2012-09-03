@@ -26,6 +26,8 @@
 //#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/Display.h"
 
+#include <QWidget>
+
 namespace cinder { namespace app {
 
 class AppImplQtBasic : public AppImplQt {
@@ -68,6 +70,7 @@ class AppImplQtBasic : public AppImplQt {
 	*/
 	double					mNextFrameTime;
 	Display					*mDisplay;
+	QWidget					*mWindow;
 	/*
 	std::map<DWORD,Vec2f>	mMultiTouchPrev;
 

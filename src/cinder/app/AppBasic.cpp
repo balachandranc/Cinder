@@ -79,11 +79,15 @@ void AppBasic::executeLaunch( AppBasic *app, class Renderer *renderer, const cha
 	// Free memory allocated for CommandLineToArgvW arguments.
 	::LocalFree( szArglist );
 }
+
 #elif defined( CINDER_LINUX )
+
 void AppBasic::executeLaunch( AppBasic *app, class Renderer *renderer, const char *title, int argc, char * const argv[])
 {
-
+	sInstance = app;
+	App::executeLaunch( app, renderer, title, argc, argv );
 }
+
 #endif
 
 void AppBasic::launch( const char *title, int argc, char * const argv[] )

@@ -26,6 +26,7 @@
 #include "cinder/Vector.h"
 #include <string>
 #include <vector>
+#include <QApplication>
 
 // we declare all of the MultiTouch stuff in Win7 here to prevent requiring users to use the Win7 headers
 /*
@@ -80,6 +81,8 @@ class AppImplQt {
 	static fs::path		getSaveFilePath( const fs::path &initialPath, std::vector<std::string> extensions );
 	static fs::path		getFolderPath( const fs::path &initialPath );
 	
+	static void 	prepareLaunch();
+
  protected:
 	class App	*mApp;
 	int			mWindowWidth, mWindowHeight;	
@@ -87,6 +90,7 @@ class AppImplQt {
 	Vec2i		mWindowOffset;
 	float		mFrameRate;
 	//ULONG_PTR	mGdiplusToken;
+	static QApplication 	*sQApp;
 };
 
 } } // namespace cinder::app

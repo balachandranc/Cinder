@@ -26,6 +26,9 @@
 #include "cinder/app/Renderer.h"
 #include "cinder/Utilities.h"
 
+#include <QRect>
+#include <QDesktopWidget>
+#include <QWidget>
 
 using std::vector;
 using std::string;
@@ -96,6 +99,8 @@ void AppImplQtBasic::run()
 			::Sleep( 0 );
 	}
 	 */
+
+	sQApp->exec();
 
 	killWindow( mFullScreen );
 	mApp->privateShutdown__();
@@ -202,6 +207,23 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 
 	return true;									// Success
 	*/
+
+	QDesktopWidget *desktopWidget = QApplication::desktop();
+	QRect rect = desktopWidget->screenGeometry( -1 );
+
+	if( !mFullScreen ) { // center the window on the display if windowed
+		rect.setLeft ( ( getDisplay()->getWidth() - rect.width() ) / 2 );
+		rect.setTop ( ( getDisplay()->getHeight() - rect.height() ) / 2 );
+	}
+
+	mWindow = new QWidget();
+	mWindow->resize( rect.width(), rect.height() );
+	mWindow->show();
+	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
+
+	mApp->getRenderer()->setup( mApp );
+
+	return true;
 }
 
 void AppImplQtBasic::killWindow( bool wasFullScreen )
