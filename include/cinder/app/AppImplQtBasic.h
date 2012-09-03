@@ -92,7 +92,7 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 	*/
 	double					mNextFrameTime;
 	Display					*mDisplay;
-	QGLWidget					*mWindow;
+	QGLWidget				*mWindow;
 	/*
 	std::map<DWORD,Vec2f>	mMultiTouchPrev;
 

@@ -104,9 +104,10 @@ void AppImplQtBasic::run()
 	}
 	 */
 
+	int frameUpdateDelayMs = (int) ( 1000.0f / mFrameRate );
 	QTimer *timer = new QTimer();
 	connect ( timer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
-	timer->start(30);
+	timer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
 	sQApp->installEventFilter( new QtEventHandler( getApp() ) );
@@ -394,10 +395,6 @@ bool AppImplQtBasic::eventFilter( QObject *obj, QEvent *event )
 
 void AppImplQtBasic::paint()
 {
-
-	std::cout << QTime::currentTime().msec() << std::endl;
-	std::cout.flush();
-
 	mApp->getRenderer()->startDraw();
 	mApp->draw();
 	mApp->getRenderer()->finishDraw();
