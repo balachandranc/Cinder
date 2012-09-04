@@ -26,6 +26,8 @@
 #	include <mach/mach_time.h>
 #elif defined( CINDER_MSW ) 
 #	include <windows.h>
+#elif defined( CINDER_LINUX )
+#	include <QDateTime>
 #endif
 
 namespace cinder {
@@ -38,8 +40,10 @@ void Rand::randomize()
 {
 #if defined( CINDER_COCOA )
 	sBase = boost::mt19937( mach_absolute_time() );
-#else
+#elif defined( CINDER_MSW )
 	sBase = boost::mt19937( ::GetTickCount() );
+#elif defined( CINDER_LINUX )
+	sBase = boost::mt19937( QDateTime::currentDateTime().toMSecsSinceEpoch() );
 #endif
 }
 

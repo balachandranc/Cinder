@@ -35,4 +35,5 @@ add_library(cinder
 	Surface.cpp
 	Channel.cpp
 	Timer.cpp
+	Rand.cpp
 )

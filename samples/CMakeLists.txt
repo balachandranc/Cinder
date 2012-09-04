@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8) 
 
 PROJECT(CinderSamples)
+
 SET(CMAKE_BUILD_TYPE debug) 
 SET(CMAKE_C_COMPILER "/usr/bin/clang")
 SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
@@ -14,25 +15,11 @@ set(Boost_USE_STATIC_LIBS 		ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 find_package(Boost COMPONENTS system filesystem)
-
-if (${Boost_FOUND})
-	message("${Boost_LIBRARIES}")
-endif()
-
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL) 
 include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-find_package(CURL)
-
-message("Qt Definitions: ${QT_DEFINITIONS}")
-
-if (${OPENGL_FOUND})
-	message("The opengl libs: ${OPENGL_LIBRARIES}")
-else()
-	message("OpenGl not found")
-endif()
+find_package(CURL REQUIRED)
 
 #incude cinder and boost header files and libraries.
 set(CINDER_ROOT "/home/bchandra/workspace/Cinder")
@@ -52,6 +39,17 @@ set(CINDER_LIBRARIES
 	${CINDER_LIB_DIR}/../libtess2/libtess2.a 
 	)
 
-add_subdirectory(
-	basicApp
-	)
+message("Cinder libraries: ${CINDER_LIBRARIES}")
+message("Qt libraries: ${QT_LIBRARIES}")
+message("Boost libraries: ${Boost_LIBRARIES}")
+
+set(CinderSamples_LINK_LIBRARIES 
+	${OPENGL_LIBRARIES}
+	${CINDER_LIBRARIES}
+	${QT_LIBRARIES}
+	${CURL_LIBRARIES}
+	${Boost_LIBRARIES}
+)
+
+add_subdirectory(basicApp)
+add_subdirectory(ArcballDemo)
