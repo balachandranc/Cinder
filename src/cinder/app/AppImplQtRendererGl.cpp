@@ -43,13 +43,14 @@ void AppImplQtRendererGl::prepareToggleFullScreen()
 	//mPrevRC = mRC;
 }
 
-void AppImplQtRendererGl::finishToggleFullScreen()
+void AppImplQtRendererGl::finishToggleFullScreen( QGLWidget *aGLWidget )
 {
 	/*
 	if( mPrevRC ) {
 		::wglDeleteContext( mPrevRC );
 	}
 	*/
+	mGLWidget = aGLWidget;
 }
 
 void AppImplQtRendererGl::defaultResize() const

@@ -110,9 +110,9 @@ void AppImplQtBasic::run()
 	timer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
-	mWindow->installEventFilter( new QtEventHandler( this ) );
 	mWindow->setFocus();
 
+	sQApp->installEventFilter( new QtEventHandler( this ) );
 	sQApp->exec();
 
 	killWindow( mFullScreen );
@@ -288,6 +288,7 @@ void AppImplQtBasic::toggleFullScreen()
 	bool prevFullScreen = mFullScreen;
 	//HDC oldDC = mDC;
 	//HWND oldWnd = mWnd;
+	QGLWidget *oldWindow = mWindow;
 	
 	mFullScreen = ! mFullScreen;
 	
@@ -308,7 +309,7 @@ void AppImplQtBasic::toggleFullScreen()
 
 	mApp->getRenderer()->prepareToggleFullScreen();
 	createWindow( &windowWidth, &windowHeight );
-	mApp->getRenderer()->finishToggleFullScreen();
+	mApp->getRenderer()->finishToggleFullScreen( mWindow );
 
 	/*
 	::ReleaseDC( oldWnd, oldDC );
@@ -319,8 +320,12 @@ void AppImplQtBasic::toggleFullScreen()
 		::UnregisterClass( WINDOWED_WIN_CLASS_NAME, mInstance );
 	*/
 
+	oldWindow->close();
+
 	mWindowWidth = windowWidth;
 	mWindowHeight = windowHeight;
+
+	mWindow->setFocus();
 
 	/*
 	::ShowWindow( mWnd, SW_SHOW );

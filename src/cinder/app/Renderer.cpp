@@ -264,9 +264,9 @@ void RendererGl::prepareToggleFullScreen()
 	mImpl->prepareToggleFullScreen();
 }
 
-void RendererGl::finishToggleFullScreen()
+void RendererGl::finishToggleFullScreen( QGLWidget *aGLWidget )
 {
-	mImpl->finishToggleFullScreen();
+	mImpl->finishToggleFullScreen( aGLWidget );
 }
 
 void RendererGl::startDraw()

@@ -88,7 +88,7 @@ class Renderer {
 	virtual void setup( App *aApp, QGLWidget *aGLWidget ) = 0;
 
 	virtual void prepareToggleFullScreen() {}
-	virtual void finishToggleFullScreen() {}
+	virtual void finishToggleFullScreen( QGLWidget *aGLWidget ) {}
 	virtual void kill() {}
 #endif
 
@@ -130,7 +130,7 @@ class RendererGl : public Renderer {
 	virtual void	kill();
 	//virtual HWND	getHwnd() { return mWnd; }
 	virtual void	prepareToggleFullScreen();
-	virtual void	finishToggleFullScreen();
+	virtual void	finishToggleFullScreen( QGLWidget *aGLWidget );
 #endif
 
 	enum	{ AA_NONE = 0, AA_MSAA_2, AA_MSAA_4, AA_MSAA_6, AA_MSAA_8, AA_MSAA_16, AA_MSAA_32 };

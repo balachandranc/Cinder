@@ -35,7 +35,7 @@ class AppImplQtRendererGl {
 	
 	virtual bool	initialize( /*HWND wnd, HDC dc*/ );
 	virtual void	prepareToggleFullScreen();
-	virtual void	finishToggleFullScreen();
+	virtual void	finishToggleFullScreen( QGLWidget *aGLWidget );
 	virtual void	kill();
 	virtual void	defaultResize() const;
 	virtual void	swapBuffers() const;
