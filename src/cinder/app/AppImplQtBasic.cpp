@@ -730,11 +730,32 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 				mApp->privateMouseDrag__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
 													0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
 			}
+
+			break;
+		}
+
+		case QEvent::MouseButtonPress: {
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );
+			QPoint pos = mouseEvent->pos();
+			mImpl->mIsDragging = true;
+			switch( mouseEvent->button() ){
+				case Qt::LeftButton:
+					mApp->privateMouseDown__( MouseEvent( MouseEvent::LEFT_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+														0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+				case Qt::RightButton:
+					mApp->privateMouseDown__( MouseEvent( MouseEvent::RIGHT_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+				case Qt::MidButton:
+					mApp->privateMouseDown__( MouseEvent( MouseEvent::MIDDLE_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+			}
 			break;
 		}
 
 		case QEvent::Resize: {
-
 			if( mImpl->mHasBeenInitialized ) {
 				QResizeEvent *resizeEvent = static_cast<QResizeEvent *>( event );
 				QSize size = resizeEvent->size();
