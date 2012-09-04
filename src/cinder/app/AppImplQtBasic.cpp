@@ -486,12 +486,9 @@ void AppImplQtBasic::onTouch( HWND hWnd, WPARAM wParam, LPARAM lParam )
 }
 */
 
-unsigned int prepMouseEventModifiers( QMouseEvent *event )
+unsigned int prepMouseEventModifiers( Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers )
 {
 	unsigned int result = 0;
-
-	Qt::MouseButtons buttons = event->buttons();
-	Qt::KeyboardModifiers modifiers = event->modifiers();
 
 	if( modifiers & Qt::ControlModifier ) result |= MouseEvent::CTRL_DOWN;
 	if( buttons & Qt::LeftButton ) result |= MouseEvent::LEFT_DOWN;
@@ -502,6 +499,16 @@ unsigned int prepMouseEventModifiers( QMouseEvent *event )
 	if( modifiers & Qt::MetaModifier ) result |= MouseEvent::META_DOWN;
 
 	return result;
+}
+
+unsigned int prepMouseEventModifiers( QMouseEvent *event )
+{
+	return prepMouseEventModifiers( event->buttons(), event->modifiers() );
+}
+
+unsigned int prepMouseEventModifiers( QWheelEvent *event )
+{
+	return prepMouseEventModifiers( event->buttons(), event->modifiers() );
 }
 
 unsigned int prepKeyEventModifiers( QKeyEvent *event )
@@ -608,38 +615,12 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 			impl->quit();
 			return 0;
 		break;
-		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:							// Is A Key Being Held Down? 
-			impl->getApp()->privateKeyDown__( KeyEvent( KeyEvent::translateNativeKeyCode( prepNativeKeyCode( (int)wParam ) ), 
-					mapVirtualKey( wParam ), prepKeyEventModifiers(), (int)wParam ) );
-			return 0;								// Jump Back
-		break;
-		case WM_SYSKEYUP:
-		case WM_KEYUP:								// Has A Key Been Released?
-			impl->getApp()->privateKeyUp__( KeyEvent( KeyEvent::translateNativeKeyCode( prepNativeKeyCode( (int)wParam ) ), 
-					mapVirtualKey( wParam ), prepKeyEventModifiers(), (int)wParam ) );
-			return 0;								// Jump Back
-		break;
-		
-		// mouse events
-		case WM_MOUSEWHEEL:
-			impl->getApp()->privateMouseWheel__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ),
-					GET_WHEEL_DELTA_WPARAM( wParam ) / 120.0f, static_cast<unsigned int>( wParam ) ) );			
-		break;
 		case WM_KILLFOCUS:
 			// if we lose capture during a drag, post a mouseup event as a notifier
 			if( impl->mIsDragging ) {
 				impl->getApp()->privateMouseUp__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
 			}
 			impl->mIsDragging = false;
-		break;
-		case WM_SIZE:
-			if( impl->mHasBeenInitialized ) {
-				impl->mWindowWidth = LOWORD(lParam);
-				impl->mWindowHeight = HIWORD(lParam);
-				impl->getApp()->privateResize__( ResizeEvent( Vec2i( impl->mWindowWidth, impl->mWindowHeight ) ) );
-			}
-			return 0;
 		break;
 		case WM_MOVE:
 			if( impl->mHasBeenInitialized ) {
@@ -765,6 +746,15 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
 					break;
 			}
+			break;
+		}
+
+		case QEvent::Wheel: {
+			QWheelEvent *wheelEvent = static_cast<QWheelEvent *>( event );
+			QPoint pos = wheelEvent->pos();
+			mApp->privateMouseWheel__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( wheelEvent ),
+												wheelEvent->delta() / 120.0f, static_cast<unsigned int>( wheelEvent->buttons() ) ) );
+
 			break;
 		}
 
