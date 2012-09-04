@@ -31,6 +31,9 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/CaptureImplDirectShow.h"
 	typedef cinder::CaptureImplDirectShow	CapturePlatformImpl;
+#elif defined( CINDER_LINUX )
+	#include "cinder/CaptureImplV4l2.h"
+	typedef cinder::CaptureImplV4l2	  CapturePlatformImpl;
 #endif
 
 #include <set>

@@ -51,6 +51,8 @@ namespace cinder {
 
 #if defined( CINDER_MSW )
 	class CaptureImplDirectShow;
+#elif defined( CINDER_LINUX )
+	class CaptureImplV4l2;
 #endif
 
 class Capture {
@@ -129,6 +131,8 @@ class Capture {
 		CaptureImplAvFoundation			*mImpl;
 #elif defined( CINDER_MSW )
 		CaptureImplDirectShow			*mImpl;
+#elif defined( CINDER_LINUX )
+		CaptureImplV4l2					*mImpl;
 #endif
 	};
 	

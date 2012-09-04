@@ -39,4 +39,6 @@ add_library(cinder
 	Rand.cpp
 	Perlin.cpp
 	Shape2d.cpp
+	Capture.cpp
+	CaptureImplV4l2.cpp
 )
