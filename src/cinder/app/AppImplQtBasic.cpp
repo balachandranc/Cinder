@@ -729,6 +729,9 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 			if( mouseEvent->buttons() ) {
 				mApp->privateMouseDrag__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
 													0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+			} else {
+				mApp->privateMouseMove__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+													0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
 			}
 
 			break;
@@ -749,6 +752,27 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 					break;
 				case Qt::MidButton:
 					mApp->privateMouseDown__( MouseEvent( MouseEvent::MIDDLE_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+			}
+			break;
+		}
+
+		case QEvent::MouseButtonRelease: {
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );
+			QPoint pos = mouseEvent->pos();
+			mImpl->mIsDragging = false;
+			switch( mouseEvent->button() ){
+				case Qt::LeftButton:
+					mApp->privateMouseUp__( MouseEvent( MouseEvent::LEFT_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+														0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+				case Qt::RightButton:
+					mApp->privateMouseUp__( MouseEvent( MouseEvent::RIGHT_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+					break;
+				case Qt::MidButton:
+					mApp->privateMouseUp__( MouseEvent( MouseEvent::MIDDLE_DOWN, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
 																		0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
 					break;
 			}
