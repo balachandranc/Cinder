@@ -14,6 +14,7 @@ add_library( app
 	AppImplQtBasic.cpp
 	Renderer.cpp
 	AppImplQtRendererGl.cpp
+	KeyEvent.cpp
 
 	#$app_HEADERS_MOC	
 	moc_AppImplQtBasic.cxx

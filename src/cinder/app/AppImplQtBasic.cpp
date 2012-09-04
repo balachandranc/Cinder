@@ -504,6 +504,20 @@ unsigned int prepMouseEventModifiers( QMouseEvent *event )
 	return result;
 }
 
+unsigned int prepKeyEventModifiers( QKeyEvent *event )
+{
+	unsigned int result = 0;
+
+	Qt::KeyboardModifiers modifiers = event->modifiers();
+
+	if( modifiers & Qt::ControlModifier ) result |= KeyEvent::CTRL_DOWN;
+	if( modifiers & Qt::ShiftModifier ) result |= KeyEvent::SHIFT_DOWN;
+	if( modifiers & Qt::AltModifier ) result |= KeyEvent::ALT_DOWN;
+	if( modifiers & Qt::MetaModifier ) result |= KeyEvent::META_DOWN;
+
+	return result;
+}
+
 /*
 unsigned int prepMouseEventModifiers( WPARAM wParam )
 {
@@ -608,42 +622,6 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 		break;
 		
 		// mouse events
-		case WM_LBUTTONDOWN:
-			::SetCapture( mWnd );
-			impl->mIsDragging = true;
-			impl->getApp()->privateMouseDown__( MouseEvent( MouseEvent::LEFT_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;
-		case WM_RBUTTONDOWN:
-			::SetCapture( mWnd );
-			impl->mIsDragging = true;
-			impl->getApp()->privateMouseDown__( MouseEvent( MouseEvent::RIGHT_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;		
-		case WM_MBUTTONDOWN:
-			::SetCapture( mWnd );
-			impl->mIsDragging = true;		
-			impl->getApp()->privateMouseDown__( MouseEvent( MouseEvent::MIDDLE_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;
-		case WM_LBUTTONUP:
-			::ReleaseCapture();
-			impl->mIsDragging = false;		
-			impl->getApp()->privateMouseUp__( MouseEvent( MouseEvent::LEFT_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;
-		case WM_RBUTTONUP:
-			::ReleaseCapture();
-			impl->mIsDragging = false;		
-			impl->getApp()->privateMouseUp__( MouseEvent( MouseEvent::RIGHT_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;		
-		case WM_MBUTTONUP:
-			::ReleaseCapture();
-			impl->mIsDragging = false;	
-			impl->getApp()->privateMouseUp__( MouseEvent( MouseEvent::MIDDLE_DOWN, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
-			return 0;
-		break;
 		case WM_MOUSEWHEEL:
 			impl->getApp()->privateMouseWheel__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ),
 					GET_WHEEL_DELTA_WPARAM( wParam ) / 120.0f, static_cast<unsigned int>( wParam ) ) );			
@@ -654,15 +632,6 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 				impl->getApp()->privateMouseUp__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ), 0.0f, static_cast<unsigned int>( wParam ) ) );
 			}
 			impl->mIsDragging = false;
-		break;
-		case WM_MOUSEMOVE:
-			if( impl->mIsDragging ) {
-				impl->getApp()->privateMouseDrag__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ),
-						0.0f, static_cast<unsigned int>( wParam ) ) );						
-}
-			else
-				impl->getApp()->privateMouseMove__( MouseEvent( 0, LOSHORT(lParam), HISHORT(lParam), prepMouseEventModifiers( wParam ),
-						0.0f, static_cast<unsigned int>( wParam ) ) );						
 		break;
 		case WM_SIZE:
 			if( impl->mHasBeenInitialized ) {
@@ -722,6 +691,26 @@ QtEventHandler::QtEventHandler( AppImplQtBasic *aImpl): QObject(), mImpl( aImpl 
 bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 {
 	switch( event-> type() ) {
+
+		case QEvent::KeyPress: {
+			QKeyEvent *keyEvent = static_cast<QKeyEvent *>( event );
+			char charCode = 0;
+			if( keyEvent->text().length() )
+				charCode = keyEvent->text().toAscii().at( 0 );
+			mApp->privateKeyDown__( KeyEvent( KeyEvent::translateNativeKeyCode( keyEvent->key() ),
+					charCode,  prepKeyEventModifiers( keyEvent ), keyEvent->nativeVirtualKey() ) );
+			break;
+		}
+
+		case QEvent::KeyRelease: {
+			QKeyEvent *keyEvent = static_cast<QKeyEvent *>( event );
+			char charCode = 0;
+			if( keyEvent->text().length() )
+				charCode = keyEvent->text().toAscii().at( 0 );
+			mApp->privateKeyUp__( KeyEvent( KeyEvent::translateNativeKeyCode( keyEvent->key() ),
+					charCode,  prepKeyEventModifiers( keyEvent ), keyEvent->nativeVirtualKey() ) );
+			break;
+		}
 
 		case QEvent::MouseMove: {
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );

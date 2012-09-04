@@ -327,6 +327,162 @@ int	KeyEvent::translateNativeKeyCode( int nativeKeyCode )
 	else
 		return sKeyTable[nativeKeyCode];
 }
-#endif // defined( CINDER_MSW )
+
+// defined( CINDER_MSW )
+
+#elif defined( CINDER_LINUX )
+
+#include <Qt>
+
+static bool sTableInited = false;
+map<int,int> sKeyTable;
+
+using namespace Qt;
+
+// Much of this keyTable is courtesy of SDL's keyboard handling code
+static void initKeyTable()
+{
+
+	sKeyTable[Key_Backspace] 	= KeyEvent::KEY_BACKSPACE;
+	sKeyTable[Key_Tab] 			= KeyEvent::KEY_TAB;
+	sKeyTable[Key_Clear]		= KeyEvent::KEY_CLEAR;
+	sKeyTable[Key_Return] 		= KeyEvent::KEY_RETURN;
+	sKeyTable[Key_Pause] 		= KeyEvent::KEY_PAUSE;
+	sKeyTable[Key_Escape] 		= KeyEvent::KEY_ESCAPE;
+	sKeyTable[Key_Space] 		= KeyEvent::KEY_SPACE;
+	sKeyTable[Key_QuoteDbl]		= KeyEvent::KEY_QUOTE;
+	sKeyTable[Key_Comma] 		= KeyEvent::KEY_COMMA;
+	sKeyTable[Key_Minus] 		= KeyEvent::KEY_MINUS;
+	sKeyTable[Key_Period] 		= KeyEvent::KEY_PERIOD;
+	sKeyTable[Key_Slash] 		= KeyEvent::KEY_SLASH;
+
+	sKeyTable[Key_0] = KeyEvent::KEY_0;
+	sKeyTable[Key_1] = KeyEvent::KEY_1;
+	sKeyTable[Key_2] = KeyEvent::KEY_2;
+	sKeyTable[Key_3] = KeyEvent::KEY_3;
+	sKeyTable[Key_4] = KeyEvent::KEY_4;
+	sKeyTable[Key_5] = KeyEvent::KEY_5;
+	sKeyTable[Key_6] = KeyEvent::KEY_6;
+	sKeyTable[Key_7] = KeyEvent::KEY_7;
+	sKeyTable[Key_8] = KeyEvent::KEY_8;
+	sKeyTable[Key_9] = KeyEvent::KEY_9;
+
+	sKeyTable[Key_Semicolon] 	= KeyEvent::KEY_SEMICOLON;
+	sKeyTable[Key_Equal] 		= KeyEvent::KEY_EQUALS;
+	sKeyTable[Key_BracketLeft] 	= KeyEvent::KEY_LEFTBRACKET;
+	sKeyTable[Key_Backslash] 	= KeyEvent::KEY_BACKSLASH;
+	sKeyTable[Key_Less] 		= KeyEvent::KEY_LESS;
+	sKeyTable[Key_BracketRight] = KeyEvent::KEY_RIGHTBRACKET;
+	sKeyTable[Key_QuoteLeft] 	= KeyEvent::KEY_BACKQUOTE;
+	//sKeyTable[0xDF] = KeyEvent::KEY_BACKQUOTE;
+
+	sKeyTable[Key_A] = KeyEvent::KEY_a;
+	sKeyTable[Key_B] = KeyEvent::KEY_b;
+	sKeyTable[Key_C] = KeyEvent::KEY_c;
+	sKeyTable[Key_D] = KeyEvent::KEY_d;
+	sKeyTable[Key_E] = KeyEvent::KEY_e;
+	sKeyTable[Key_F] = KeyEvent::KEY_f;
+	sKeyTable[Key_G] = KeyEvent::KEY_g;
+	sKeyTable[Key_H] = KeyEvent::KEY_h;
+	sKeyTable[Key_I] = KeyEvent::KEY_i;
+	sKeyTable[Key_J] = KeyEvent::KEY_j;
+	sKeyTable[Key_K] = KeyEvent::KEY_k;
+	sKeyTable[Key_L] = KeyEvent::KEY_l;
+	sKeyTable[Key_M] = KeyEvent::KEY_m;
+	sKeyTable[Key_N] = KeyEvent::KEY_n;
+	sKeyTable[Key_O] = KeyEvent::KEY_o;
+	sKeyTable[Key_P] = KeyEvent::KEY_p;
+	sKeyTable[Key_Q] = KeyEvent::KEY_q;
+	sKeyTable[Key_R] = KeyEvent::KEY_r;
+	sKeyTable[Key_S] = KeyEvent::KEY_s;
+	sKeyTable[Key_T] = KeyEvent::KEY_t;
+	sKeyTable[Key_U] = KeyEvent::KEY_u;
+	sKeyTable[Key_V] = KeyEvent::KEY_v;
+	sKeyTable[Key_W] = KeyEvent::KEY_w;
+	sKeyTable[Key_X] = KeyEvent::KEY_x;
+	sKeyTable[Key_Y] = KeyEvent::KEY_y;
+	sKeyTable[Key_Z] = KeyEvent::KEY_z;
+
+	sKeyTable[Key_Delete] = KeyEvent::KEY_DELETE;
+
+	/*
+	sKeyTable[VK_NUMPAD0] = KeyEvent::KEY_KP0;
+	sKeyTable[VK_NUMPAD1] = KeyEvent::KEY_KP1;
+	sKeyTable[VK_NUMPAD2] = KeyEvent::KEY_KP2;
+	sKeyTable[VK_NUMPAD3] = KeyEvent::KEY_KP3;
+	sKeyTable[VK_NUMPAD4] = KeyEvent::KEY_KP4;
+	sKeyTable[VK_NUMPAD5] = KeyEvent::KEY_KP5;
+	sKeyTable[VK_NUMPAD6] = KeyEvent::KEY_KP6;
+	sKeyTable[VK_NUMPAD7] = KeyEvent::KEY_KP7;
+	sKeyTable[VK_NUMPAD8] = KeyEvent::KEY_KP8;
+	sKeyTable[VK_NUMPAD9] = KeyEvent::KEY_KP9;
+
+	sKeyTable[VK_DECIMAL] = KeyEvent::KEY_KP_PERIOD;
+	sKeyTable[VK_DIVIDE] = KeyEvent::KEY_KP_DIVIDE;
+	sKeyTable[VK_MULTIPLY] = KeyEvent::KEY_KP_MULTIPLY;
+	sKeyTable[VK_SUBTRACT] = KeyEvent::KEY_KP_MINUS;
+	sKeyTable[VK_ADD] = KeyEvent::KEY_KP_PLUS;
+	 */
+
+	sKeyTable[Key_Up] 		= KeyEvent::KEY_UP;
+	sKeyTable[Key_Down] 	= KeyEvent::KEY_DOWN;
+	sKeyTable[Key_Right] 	= KeyEvent::KEY_RIGHT;
+	sKeyTable[Key_Left]		= KeyEvent::KEY_LEFT;
+	sKeyTable[Key_Insert] 	= KeyEvent::KEY_INSERT;
+	sKeyTable[Key_Home] 	= KeyEvent::KEY_HOME;
+	sKeyTable[Key_End] 		= KeyEvent::KEY_END;
+	sKeyTable[Key_PageUp] 	= KeyEvent::KEY_PAGEUP;
+	sKeyTable[Key_PageDown] = KeyEvent::KEY_PAGEDOWN;
+
+	sKeyTable[Key_F1] = KeyEvent::KEY_F1;
+	sKeyTable[Key_F2] = KeyEvent::KEY_F2;
+	sKeyTable[Key_F3] = KeyEvent::KEY_F3;
+	sKeyTable[Key_F4] = KeyEvent::KEY_F4;
+	sKeyTable[Key_F5] = KeyEvent::KEY_F5;
+	sKeyTable[Key_F6] = KeyEvent::KEY_F6;
+	sKeyTable[Key_F7] = KeyEvent::KEY_F7;
+	sKeyTable[Key_F8] = KeyEvent::KEY_F8;
+	sKeyTable[Key_F9] = KeyEvent::KEY_F9;
+	sKeyTable[Key_F10] = KeyEvent::KEY_F10;
+	sKeyTable[Key_F11] = KeyEvent::KEY_F11;
+	sKeyTable[Key_F12] = KeyEvent::KEY_F12;
+	sKeyTable[Key_F13] = KeyEvent::KEY_F13;
+	sKeyTable[Key_F14] = KeyEvent::KEY_F14;
+	sKeyTable[Key_F15] = KeyEvent::KEY_F15;
+
+	sKeyTable[Key_NumLock] = KeyEvent::KEY_NUMLOCK;
+	sKeyTable[Key_CapsLock] = KeyEvent::KEY_CAPSLOCK;
+	sKeyTable[Key_ScrollLock] = KeyEvent::KEY_SCROLLOCK;
+	//sKeyTable[Key_Shift] = KeyEvent::KEY_RSHIFT;
+	sKeyTable[Key_Shift] = KeyEvent::KEY_LSHIFT;
+	//sKeyTable[VK_RCONTROL] = KeyEvent::KEY_RCTRL;
+	sKeyTable[Key_Control] = KeyEvent::KEY_LCTRL;
+	//sKeyTable[VK_RMENU] = KeyEvent::KEY_RALT;
+	sKeyTable[Key_Alt] = KeyEvent::KEY_LALT;
+	sKeyTable[Key_Super_R] = KeyEvent::KEY_RSUPER;
+	sKeyTable[Key_Super_L] = KeyEvent::KEY_LSUPER;
+
+	sKeyTable[Key_Help] = KeyEvent::KEY_HELP;
+	sKeyTable[Key_Print] = KeyEvent::KEY_PRINT;
+	//sKeyTable[VK_SNAPSHOT] = KeyEvent::KEY_PRINT;
+	sKeyTable[Key_Cancel] = KeyEvent::KEY_BREAK;
+	sKeyTable[Key_Menu] = KeyEvent::KEY_MENU;
+
+	sTableInited = true;
+}
+
+int	KeyEvent::translateNativeKeyCode( int nativeKeyCode )
+{
+	if( ! sTableInited )
+		initKeyTable();
+
+	map<int,int>::iterator iter = sKeyTable.find( nativeKeyCode );
+	if( iter != sKeyTable.end() )
+		return iter->second;
+	else
+		return KeyEvent::KEY_UNKNOWN;
+}
+
+#endif
 	
 } } // namespace cinder::app
