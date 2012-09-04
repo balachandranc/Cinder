@@ -410,6 +410,7 @@ bool AppImplQtBasic::eventFilter( QObject *obj, QEvent *event )
 
 void AppImplQtBasic::paint()
 {
+	mApp->privateUpdate__();
 	mApp->getRenderer()->startDraw();
 	mApp->draw();
 	mApp->getRenderer()->finishDraw();
