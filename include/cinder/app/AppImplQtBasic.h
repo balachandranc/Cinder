@@ -23,7 +23,6 @@
 #pragma once
 
 #include "cinder/app/AppImplQt.h"
-//#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/Display.h"
 
 #include <QGLWidget>
@@ -35,13 +34,14 @@ namespace cinder { namespace app {
 class QtEventHandler: public QObject
 {
 public:
-	QtEventHandler( class App *aApp);
+	QtEventHandler( class AppImplQtBasic *aImpl);
 	~QtEventHandler()
 	{};
 
 	bool eventFilter( QObject *obj, QEvent *event );
 
 private:
+	AppImplQtBasic *mImpl;
 	App 		*mApp;
 };
 
@@ -98,6 +98,7 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 
 	friend LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	*/
+	friend class QtEventHandler;
 };
 
 } } // namespace cinder::app

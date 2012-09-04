@@ -110,7 +110,7 @@ void AppImplQtBasic::run()
 	timer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
-	mWindow->installEventFilter( new QtEventHandler( getApp() ) );
+	mWindow->installEventFilter( new QtEventHandler( this ) );
 	mWindow->setFocus();
 
 	sQApp->exec();
@@ -714,24 +714,37 @@ LRESULT CALLBACK WndProc(	HWND	mWnd,			// Handle For This Window
 } // extern "C"
 */
 
-QtEventHandler::QtEventHandler( App *aApp ): QObject(), mApp( aApp )
+QtEventHandler::QtEventHandler( AppImplQtBasic *aImpl): QObject(), mImpl( aImpl )
 {
-
+	mApp = aImpl->getApp();
 }
 
 bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 {
 	switch( event-> type() ) {
-	case QEvent::MouseMove:
-		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );
-		QPoint pos = mouseEvent->pos();
-		if( mouseEvent->buttons() ) {
-			mApp->privateMouseDrag__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
-								0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
-		} else {
 
+		case QEvent::MouseMove: {
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( event );
+			QPoint pos = mouseEvent->pos();
+			if( mouseEvent->buttons() ) {
+				mApp->privateMouseDrag__( MouseEvent( 0, pos.x(), pos.y(), prepMouseEventModifiers( mouseEvent ),
+													0.0f, static_cast<unsigned int>( mouseEvent->buttons() ) ) );
+			}
+			break;
 		}
-		break;
+
+		case QEvent::Resize: {
+
+			if( mImpl->mHasBeenInitialized ) {
+				QResizeEvent *resizeEvent = static_cast<QResizeEvent *>( event );
+				QSize size = resizeEvent->size();
+				mImpl->mWindowWidth = size.width();
+				mImpl->mWindowHeight = size.height();
+				mApp->privateResize__( ResizeEvent( Vec2i( mImpl->mWindowWidth, mImpl->mWindowHeight ) ) );
+			}
+
+			break;
+		}
 	}
 
 	return false;
