@@ -36,4 +36,5 @@ add_library(cinder
 	Channel.cpp
 	Timer.cpp
 	Rand.cpp
+	Perlin.cpp
 )

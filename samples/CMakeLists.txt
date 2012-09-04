@@ -53,3 +53,4 @@ set(CinderSamples_LINK_LIBRARIES
 
 add_subdirectory(basicApp)
 add_subdirectory(ArcballDemo)
+add_subdirectory(BasicParticles)

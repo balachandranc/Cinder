@@ -1,0 +1,2 @@
+add_executable(BasicParticles src/BasicParticleApp.cpp)
+target_link_libraries(BasicParticles ${CinderSamples_LINK_LIBRARIES})
