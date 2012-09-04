@@ -79,6 +79,11 @@ void AppImplQtRendererGl::makeCurrentContext()
 	mGLWidget->makeCurrent();
 }
 
+QX11Info AppImplQtRendererGl::getX11Info()
+{
+	return mGLWidget->x11Info();
+}
+
 /*
 HWND createDummyWindow( int *width, int *height, bool fullscreen )
 {

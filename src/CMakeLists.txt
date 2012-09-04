@@ -31,6 +31,7 @@ set(CINDER_ROOT "./")
 include_directories(
 	"${CINDER_ROOT}/../include" 
 	"/usr/include/boost"
+	/usr/include/cairo
 	"${CINDER_ROOT}/libtess2"
 	${QT_INCLUDES}
 )

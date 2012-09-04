@@ -40,6 +40,7 @@ class AppImplQtRendererGl {
 	virtual void	defaultResize() const;
 	virtual void	swapBuffers() const;
 	virtual void	makeCurrentContext();
+	virtual QX11Info getX11Info();
 
  protected:
 	bool	initializeInternal(/* HWND wnd, HDC dc */);

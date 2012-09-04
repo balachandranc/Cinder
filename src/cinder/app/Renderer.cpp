@@ -284,6 +284,11 @@ void RendererGl::defaultResize()
 	mImpl->defaultResize();
 }
 
+QX11Info RendererGl::getX11Info()
+{
+	return mImpl->getX11Info();
+}
+
 Surface	RendererGl::copyWindowSurface( const Area &area )
 {
 	Surface s( area.getWidth(), area.getHeight(), false );

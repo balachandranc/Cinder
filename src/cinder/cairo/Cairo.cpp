@@ -35,6 +35,9 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/app/App.h"
 	#include <cairo-win32.h>
+#elif defined( CINDER_LINUX )
+	#include "cinder/app/App.h"
+	#include <cairo-xlib.h>
 #endif
 
 using std::vector;
@@ -319,7 +322,7 @@ SurfaceEps::SurfaceEps( const std::string &filePath, double widthInPoints, doubl
 	: SurfaceBase( (int32_t)widthInPoints, (int32_t)heightInPoints )
 {
 	mCairoSurface = cairo_ps_surface_create( filePath.c_str(), widthInPoints, heightInPoints ); 
-	cairo_ps_surface_set_eps( mCairoSurface, TRUE );
+	cairo_ps_surface_set_eps( mCairoSurface, 1 /*TRUE*/ );
 	cairo_ps_surface_restrict_to_level( mCairoSurface, ( enableLevel3 ) ? CAIRO_PS_LEVEL_3 : CAIRO_PS_LEVEL_2 );
 }
 
@@ -409,6 +412,17 @@ SurfaceGdi::SurfaceGdi( const SurfaceGdi &other )
 }
 
 #endif // defined( CINDER_MSW )
+
+#if defined( CINDER_LINUX )
+SurfaceX11::SurfaceX11( QX11Info aInfo, int width, int height )
+	: SurfaceBase(), mInfo( aInfo )
+{
+	mCairoSurface = cairo_xlib_surface_create( mInfo.display(), mInfo.appRootWindow(), (Visual *) mInfo.visual(), width, height );
+	mWidth = width;
+	mHeight = height;
+}
+
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // Matrix
@@ -1631,6 +1645,8 @@ void Context::setFont( const cinder::Font &font )
 	cairo_font_face_t *cairoFont = cairo_quartz_font_face_create_for_cgfont( font.getCgFontRef() );
 #elif defined( CINDER_MSW )
 	cairo_font_face_t *cairoFont = cairo_win32_font_face_create_for_logfontw( &font.getLogfont() );
+#elif defined( CINDER_LINUX )
+	cairo_font_face_t *cairoFont = cairo_user_font_face_create();
 #endif
 	cairo_set_font_face( mCairo, cairoFont );
 	cairo_font_face_destroy( cairoFont );
@@ -1689,6 +1705,12 @@ cairo::SurfaceGdi createWindowSurface()
 cairo::SurfaceQuartz createWindowSurface()
 {
 	return cairo::SurfaceQuartz( cinder::app::App::get()->getRenderer()->getCgContext(), cinder::app::getWindowWidth(), cinder::app::getWindowHeight() );
+}
+#elif defined( CINDER_LINUX )
+cairo::SurfaceX11 createWindowSurface()
+{
+	QX11Info info = cinder::app::App::get()->getRenderer()->getX11Info();
+	return cairo::SurfaceX11 ( info, cinder::app::getWindowWidth(), cinder::app::getWindowHeight() );
 }
 #endif
 

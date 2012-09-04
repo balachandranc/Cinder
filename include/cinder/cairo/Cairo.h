@@ -35,6 +35,9 @@
 	#include <CoreGraphics/CoreGraphics.h>
 #elif defined( CINDER_MAC )
 	#include <ApplicationServices/ApplicationServices.h>
+#elif defined( CINDER_LINUX )
+	#include <cairo.h>
+	#include <QX11Info>
 #endif
 
 #include <string>
@@ -76,11 +79,13 @@ typedef struct _cairo_scaled_font cairo_scaled_font_t;
 /*struct _cairo_glyph;
 typedef struct _cairo_glyph cairo_glyph_t;*/
 
+/*
 struct _cairo_text_extents;
 typedef struct _cairo_text_extents cairo_text_extents_t;
 
 struct _cairo_font_extents;
 typedef struct _cairo_font_extents cairo_font_extents_t;
+*/
 
 namespace cinder { namespace cairo {
 /////////////////////////////////////////////////////////////////////////////
@@ -246,6 +251,20 @@ class SurfaceGdi : public SurfaceBase {
 	HDC		mDc;
 }; 
 #endif // defined( CINDER_MSW )
+
+#if defined( CINDER_LINUX )
+class SurfaceX11: public SurfaceBase {
+  public:
+	SurfaceX11() : SurfaceBase() {}
+	SurfaceX11( QX11Info aInfo, int32_t width, int32_t height );
+	SurfaceX11( const SurfaceX11 &other );
+
+	QX11Info getX11Info() const { return mInfo; }
+  protected:
+
+	QX11Info mInfo;
+};
+#endif // defined( CINDER_LINUX )
 
 /////////////////////////////////////////////////////////////////////////////
 // Matrix
@@ -675,8 +694,10 @@ class Context
 
 #if defined( CINDER_COCOA )
 SurfaceQuartz	createWindowSurface();
-#else
+#elif defined( CINDER_MSW )
 SurfaceGdi		createWindowSurface();
+#elif defined( CINDER_LINUX )
+SurfaceX11		createWindowSurface();
 #endif
 
 // CONSTANTS

@@ -51,6 +51,7 @@
 	#endif
 #elif defined( CINDER_LINUX )
 	#include <QGLWidget>
+	#include <QX11Info>
 #endif
 
 
@@ -90,6 +91,7 @@ class Renderer {
 	virtual void prepareToggleFullScreen() {}
 	virtual void finishToggleFullScreen( QGLWidget *aGLWidget ) {}
 	virtual void kill() {}
+	virtual QX11Info getX11Info() = 0;
 #endif
 
 	virtual Surface	copyWindowSurface( const Area &area ) = 0;
@@ -131,6 +133,7 @@ class RendererGl : public Renderer {
 	//virtual HWND	getHwnd() { return mWnd; }
 	virtual void	prepareToggleFullScreen();
 	virtual void	finishToggleFullScreen( QGLWidget *aGLWidget );
+	virtual QX11Info getX11Info();
 #endif
 
 	enum	{ AA_NONE = 0, AA_MSAA_2, AA_MSAA_4, AA_MSAA_6, AA_MSAA_8, AA_MSAA_16, AA_MSAA_32 };

@@ -3,9 +3,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(CinderSamples)
 
 SET(CMAKE_BUILD_TYPE debug) 
-SET(CMAKE_C_COMPILER "/usr/bin/clang")
-SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-SET(CMAKE_LINKER  "/usr/bin/llvm-ld")
+#SET(CMAKE_C_COMPILER "/usr/bin/clang")
+#SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+#SET(CMAKE_LINKER  "/usr/bin/llvm-ld")
 
 add_definitions(-D_UNICODE)
 add_definitions(-DUNICODE)
@@ -24,8 +24,9 @@ find_package(CURL REQUIRED)
 #incude cinder and boost header files and libraries.
 set(CINDER_ROOT "/home/bchandra/workspace/Cinder")
 set(CINDER_INCLUDE_DIRS "${CINDER_ROOT}/include" 
-	"/usr/include/boost" 
-	"/usr/include"
+	/usr/include/boost
+	/usr/include/cairo 
+	/usr/include
 	#"${CINDER_ROOT}/src/libtess2"
 )
 include_directories(${CINDER_INCLUDE_DIRS})
@@ -34,9 +35,15 @@ set(CINDER_LIB_DIR ${CINDER_ROOT}/build/cinder)
 set(CINDER_LIBRARIES
 	${CINDER_LIB_DIR}/app/libapp.a
 	${CINDER_LIB_DIR}/gl/libgl.a
+	${CINDER_LIB_DIR}/cairo/libcairo.a
 	${CINDER_LIB_DIR}/libcinder.a
 	${CINDER_LIB_DIR}/ip/libip.a
 	${CINDER_LIB_DIR}/../libtess2/libtess2.a 
+	)
+
+set(CAIRO_LIBRARIES
+	/usr/lib/i386-linux-gnu/libcairo.a
+	/usr/lib/i386-linux-gnu/libpixman-1.a
 	)
 
 message("Cinder libraries: ${CINDER_LIBRARIES}")
@@ -44,8 +51,9 @@ message("Qt libraries: ${QT_LIBRARIES}")
 message("Boost libraries: ${Boost_LIBRARIES}")
 
 set(CinderSamples_LINK_LIBRARIES 
-	${OPENGL_LIBRARIES}
 	${CINDER_LIBRARIES}
+	${CAIRO_LIBRARIES}
+	${OPENGL_LIBRARIES}
 	${QT_LIBRARIES}
 	${CURL_LIBRARIES}
 	${Boost_LIBRARIES}
@@ -55,3 +63,4 @@ add_subdirectory(basicApp)
 add_subdirectory(ArcballDemo)
 add_subdirectory(BasicParticles)
 add_subdirectory(bezierPath)
+#add_subdirectory(bspline)

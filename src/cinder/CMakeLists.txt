@@ -1,6 +1,7 @@
 add_subdirectory(app)
 add_subdirectory(gl)
 add_subdirectory(ip)
+add_subdirectory(cairo)
 include_directories(${CINDER_INCLUDE_DIRS})
 message(" my message ${CINDER_INCLUDE_DIRS}")
 
@@ -37,4 +38,5 @@ add_library(cinder
 	Timer.cpp
 	Rand.cpp
 	Perlin.cpp
+	Shape2d.cpp
 )
