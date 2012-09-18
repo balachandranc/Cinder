@@ -309,7 +309,8 @@ static void init_device(int fd, const char *dev_name)
                 fmt.fmt.pix.width       = 640;
                 fmt.fmt.pix.height      = 480;
                 fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
+                //fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR24;
+                //fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
 
                 if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
                         errno_exit("VIDIOC_S_FMT");
@@ -351,6 +352,41 @@ static void start_capturing(int fd)
                 type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 if (-1 == xioctl(fd, VIDIOC_STREAMON, &type))
                         errno_exit("VIDIOC_STREAMON");
+}
+
+static int read_frame( int fd )
+{
+        struct v4l2_buffer buf;
+        unsigned int i;
+
+                CLEAR(buf);
+
+                buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+                buf.memory = V4L2_MEMORY_MMAP;
+
+                if (-1 == xioctl(fd, VIDIOC_DQBUF, &buf)) {
+                        switch (errno) {
+                        case EAGAIN:
+                                return 0;
+
+                        case EIO:
+                                /* Could ignore EIO, see spec. */
+
+                                /* fall through */
+
+                        default:
+                                errno_exit("VIDIOC_DQBUF");
+                        }
+                }
+
+                assert(buf.index < n_buffers);
+
+                //process_image(buffers[buf.index].start, buf.bytesused);
+
+                if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
+                        errno_exit("VIDIOC_QBUF");
+
+        return 1;
 }
 
 static void stop_capturing( int fd )
@@ -443,7 +479,7 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 
 CaptureImplV4l2::~CaptureImplV4l2()
 {
-	//CaptureMgr::instanceVI()->stopDevice( mDeviceID );
+	this->stop();
 	uninit_device();
 	close_device( mDeviceID );
 }
@@ -459,7 +495,7 @@ void CaptureImplV4l2::start()
 	mWidth = CaptureMgr::instanceVI()->getWidth( mDeviceID );
 	mHeight = CaptureMgr::instanceVI()->getHeight( mDeviceID );
 	*/
-	start_capturing(mDeviceID);
+	start_capturing( mDeviceID );
 	mIsCapturing = true;
 }
 
@@ -480,6 +516,25 @@ bool CaptureImplV4l2::isCapturing()
 bool CaptureImplV4l2::checkNewFrame() const
 {
 	//return CaptureMgr::instanceVI()->isFrameNew( mDeviceID );
+    fd_set fds;
+    struct timeval tv;
+    int r;
+
+    FD_ZERO(&fds);
+    FD_SET(mDeviceID, &fds);
+
+    /* Timeout. */
+    tv.tv_sec = 0;
+    tv.tv_usec = 1;
+
+    r = select(mDeviceID + 1, &fds, NULL, NULL, &tv);
+
+    if ( -1 == r )
+    	return false;
+    else
+    	return true;
+
+	return true;
 }
 
 Surface8u CaptureImplV4l2::getSurface() const
@@ -490,6 +545,9 @@ Surface8u CaptureImplV4l2::getSurface() const
 		CaptureMgr::instanceVI()->getPixels( mDeviceID, mCurrentFrame.getData(), false, true );
 	}
 	*/
+	read_frame( mDeviceID );
+	mCurrentFrame = mSurfaceCache->getNewSurface();
+	memcpy( mCurrentFrame.getData(), buffers[0].start, buffers[0].length );
 	return mCurrentFrame;
 }
 
