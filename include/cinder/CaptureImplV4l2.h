@@ -56,6 +56,7 @@ class CaptureImplV4l2 {
 		bool						checkAvailable() const;
 		bool						isConnected() const;
 		Capture::DeviceIdentifier	getUniqueId() const { return mUniqueId; }
+		const std::string			getName() const { return mName; }
 
 		Device( const std::string &name, int uniqueId ) : Capture::Device(), mUniqueId( uniqueId ) { mName = name; }
 	 protected:
@@ -74,6 +75,7 @@ class CaptureImplV4l2 {
 	int32_t				mWidth, mHeight;
 	mutable Surface8u	mCurrentFrame;
 	Capture::DeviceRef	mDevice;
+	std::string			mName;
 
 	static bool							sDevicesEnumerated;
 	static std::vector<Capture::DeviceRef>	sDevices;

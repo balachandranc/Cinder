@@ -59,10 +59,10 @@ set(CinderSamples_LINK_LIBRARIES
 	${Boost_LIBRARIES}
 )
 
-add_subdirectory(basicApp)
-add_subdirectory(ArcballDemo)
-add_subdirectory(BasicParticles)
-add_subdirectory(bezierPath)
-#add_subdirectory(bspline)
-add_subdirectory(Buddhabrot)
+#add_subdirectory(basicApp)
+#add_subdirectory(ArcballDemo)
+#add_subdirectory(BasicParticles)
+#add_subdirectory(bezierPath)
+##add_subdirectory(bspline)
+#add_subdirectory(Buddhabrot)
 add_subdirectory(captureTest)
