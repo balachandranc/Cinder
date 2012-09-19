@@ -163,7 +163,10 @@ static void init_mmap(int fd, const char *dev_name)
 
         CLEAR(req);
 
-        req.count = 4;
+        //req.count changed from 4 to 1.
+        //req.count = 4;
+
+        req.count = 1;
         req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         req.memory = V4L2_MEMORY_MMAP;
 
@@ -177,7 +180,7 @@ static void init_mmap(int fd, const char *dev_name)
                 }
         }
 
-        if (req.count < 2) {
+        if (req.count < 1) {
                 fprintf(stderr, "Insufficient buffer memory on %s\n",
                          dev_name);
                 exit(EXIT_FAILURE);
@@ -243,7 +246,7 @@ static int open_device(const char *dev_name)
         return fd;
 }
 
-static void init_device(int fd, const char *dev_name)
+static void init_device(int fd, const char *dev_name, int width, int height)
 {
         struct v4l2_capability cap;
         struct v4l2_cropcap cropcap;
@@ -304,13 +307,14 @@ static void init_device(int fd, const char *dev_name)
         CLEAR(fmt);
 
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        int force_format = 0;
+        int force_format = 1;
         if (force_format) {
-                fmt.fmt.pix.width       = 640;
-                fmt.fmt.pix.height      = 480;
+                fmt.fmt.pix.width       = width;
+                fmt.fmt.pix.height      = height;
                 fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
                 //fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR24;
                 //fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
+                fmt.fmt.pix.field       = V4L2_FIELD_NONE;
 
                 if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
                         errno_exit("VIDIOC_S_FMT");
@@ -469,7 +473,7 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 	}
 
 	mDeviceID = open_device( mName.c_str() );
-	init_device( mDeviceID, mName.c_str() );
+	init_device( mDeviceID, mName.c_str(), mWidth, mHeight );
 
 	mIsCapturing = false;
 	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 4 ) );
@@ -516,6 +520,8 @@ bool CaptureImplV4l2::isCapturing()
 bool CaptureImplV4l2::checkNewFrame() const
 {
 	//return CaptureMgr::instanceVI()->isFrameNew( mDeviceID );
+
+	/*
     fd_set fds;
     struct timeval tv;
     int r;
@@ -523,7 +529,6 @@ bool CaptureImplV4l2::checkNewFrame() const
     FD_ZERO(&fds);
     FD_SET(mDeviceID, &fds);
 
-    /* Timeout. */
     tv.tv_sec = 0;
     tv.tv_usec = 1;
 
@@ -533,8 +538,55 @@ bool CaptureImplV4l2::checkNewFrame() const
     	return false;
     else
     	return true;
-
+	 */
 	return true;
+}
+
+void copy_yuyv_buffer_to( void *dest, const struct buffer buffer )
+{
+	int stride = 4;
+	int numFrames = buffer.length / stride;
+	unsigned char *src = (unsigned char *) buffer.start;
+	unsigned char *dst = (unsigned char *) dest;
+
+	for( int i = 0; i < numFrames; i++ ) {
+		int dstPos = 6 * i;
+		int srcPos = stride * i;
+
+		float u  = ( src[ srcPos + 1 ] - 128.0 );
+		float v  = ( src[ srcPos + 3 ] - 128.0 );
+
+		float y1 = 1.164 * ( src[ srcPos + 0 ] - 16 );
+		float y2 = 1.164 * ( src[ srcPos + 2 ] - 16 );
+
+		float rc = 1.596 * v, gc = - 0.813 * v - 0.391 * u, bc = 2.018 * u;
+
+		float r1, g1, b1, r2, g2, b2;
+
+		b1 = y1 + bc;
+		g1 = y1 + gc;
+		r1 = y1 + rc;
+
+		b1 = (b1 < 0) ? 0 : (b1 > 255) ? 255: b1;
+		g1 = (g1 < 0) ? 0 : (g1 > 255) ? 255: g1;
+		r1 = (r1 < 0) ? 0 : (r1 > 255) ? 255: r1;
+
+		dst[ dstPos + 0 ] = b1;
+		dst[ dstPos + 1 ] = g1;
+		dst[ dstPos + 2 ] = r1;
+
+		b2 = y2 + bc;
+		g2 = y2 + gc;
+		r2 = y2 + rc;
+
+		b2 = (b2 < 0) ? 0 : (b2 > 255) ? 255: b2;
+		g2 = (g2 < 0) ? 0 : (g2 > 255) ? 255: g2;
+		r2 = (r2 < 0) ? 0 : (r2 > 255) ? 255: r2;
+
+		dst[ dstPos + 3 ] = b2;
+		dst[ dstPos + 4 ] = g2;
+		dst[ dstPos + 5 ] = r2;
+	}
 }
 
 Surface8u CaptureImplV4l2::getSurface() const
@@ -547,7 +599,7 @@ Surface8u CaptureImplV4l2::getSurface() const
 	*/
 	read_frame( mDeviceID );
 	mCurrentFrame = mSurfaceCache->getNewSurface();
-	memcpy( mCurrentFrame.getData(), buffers[0].start, buffers[0].length );
+	copy_yuyv_buffer_to( mCurrentFrame.getData(), buffers[0]);
 	return mCurrentFrame;
 }
 
