@@ -280,9 +280,11 @@ class App {
 	static fs::path				getResourcePath( const fs::path &rsrcRelativePath );
 	//! Returns the absolute file path to the bundle's resources folder. \sa \ref CinderResources
 	static fs::path				getResourcePath();
-#else
+#elif defined( CINDER_MSW )
 	//! Returns a DataSourceRef to an application resource. \a mswID and \a mswType identify the resource as defined the application's .rc file(s). \sa \ref CinderResources
 	static DataSourceRef		loadResource( int mswID, const std::string &mswType );
+#elif defined( CINDER_LINUX )
+	static DataSourceRef		loadResource( const std::string &relativePath );
 #endif
 	
 	//! Returns a DataSourceRef to an application asset. Throws a AssetLoadExc on failure.
@@ -433,9 +435,11 @@ inline DataSourceRef		loadResource( const std::string &macPath, int mswID, const
 #if defined( CINDER_COCOA )
 	//! Returns a DataSource to an application resource. \a macPath is a path relative to the bundle's resources folder. \sa \ref CinderResources
 	inline DataSourceRef	loadResource( const std::string &macPath ) { return App::loadResource( macPath ); }
-#else
+#elif defined( CINDER_MSW )
 	//! Returns a DataSource to an application resource. \a mswID and \a mswType identify the resource as defined the application's .rc file(s). \sa \ref CinderResources
 	inline DataSourceRef	loadResource( int mswID, const std::string &mswType ) { return App::loadResource( mswID, mswType ); }
+#elif defined( CINDER_LINUX )
+	inline DataSourceRef	loadResource( const std::string &relativePath) { return App::loadResource( relativePath ); }
 #endif
 
 //! Returns a DataSourceRef to the active App's's asset. Throws a AssetLoadExc on failure.

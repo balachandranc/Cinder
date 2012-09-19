@@ -202,6 +202,13 @@ DataSourceRef App::loadResource( int mswID, const string &mswType )
 	return DataSourceBuffer::create( AppImplMsw::loadResource( mswID, mswType ) );
 }
 
+#elif defined( CINDER_LINUX )
+
+DataSourceRef App::loadResource( const string &relativePath )
+{
+	return DataSourceBuffer::create( AppImplQt::loadResource( relativePath ) );
+}
+
 #endif
 
 

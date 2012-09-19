@@ -1,0 +1,3 @@
+include_directories(include)
+add_executable(ClipboardBasic src/ClipboardBasicApp.cpp)
+target_link_libraries(ClipboardBasic ${CinderSamples_LINK_LIBRARIES})

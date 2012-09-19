@@ -41,4 +41,5 @@ add_library(cinder
 	Shape2d.cpp
 	Capture.cpp
 	CaptureImplV4l2.cpp
+	Clipboard.cpp
 )

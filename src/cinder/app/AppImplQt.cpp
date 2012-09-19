@@ -24,6 +24,7 @@
 #include "cinder/app/App.h"
 #include "cinder/Utilities.h"
 
+#include <QFile>
 #include <QApplication>
 
 using std::string;
@@ -70,9 +71,10 @@ Vec2i AppImplQt::mouseLocation()
 	*/
 }
 
+/*
 Buffer AppImplQt::loadResource( int id, const std::string &type )
 {
-	/*
+
 	HRSRC resInfoHandle;
 	HGLOBAL resHandle;
 	void *dataPtr;
@@ -96,7 +98,15 @@ Buffer AppImplQt::loadResource( int id, const std::string &type )
 	}
 	dataSize = ::SizeofResource( NULL, resInfoHandle );
 	return Buffer( dataPtr, dataSize );
-	*/
+
+}
+*/
+
+Buffer AppImplQt::loadResource( const std::string &relativePath )
+{
+	QFile file( QString( relativePath.c_str() ) );
+	uchar * dataPtr = file.map( 0, file.size() );
+	return Buffer( (void *) dataPtr, (size_t) file.size() );
 }
 
 fs::path AppImplQt::getAppPath()

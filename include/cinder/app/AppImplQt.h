@@ -74,7 +74,8 @@ class AppImplQt {
 	static void	hideCursor();
 	static void	showCursor();
 	
-	static Buffer	loadResource( int id, const std::string &type );
+	//static Buffer	loadResource( int id, const std::string &type );
+	static Buffer	loadResource( const std::string &relativePath );
 	
 	static fs::path		getAppPath();	
 	static fs::path		getOpenFilePath( const fs::path &initialPath, std::vector<std::string> extensions );

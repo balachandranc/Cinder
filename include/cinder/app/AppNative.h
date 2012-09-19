@@ -42,5 +42,11 @@
 	namespace cinder { namespace app {
 		typedef AppBasic		AppNative;
 	} } // namespace cinder::app		
-	#define CINDER_APP_NATIVE( APP, RENDERER )	CINDER_APP_BASIC( APP, RENDERER )	
+	#define CINDER_APP_NATIVE( APP, RENDERER )	CINDER_APP_BASIC( APP, RENDERER )
+#elif defined( CINDER_LINUX )
+	#include "cinder/app/AppBasic.h"
+	namespace cinder { namespace app {
+		typedef AppBasic		AppNative;
+	} } // namespace cinder::app
+	#define CINDER_APP_NATIVE( APP, RENDERER ) CINDER_APP_BASIC( APP, RENDERER )
 #endif
