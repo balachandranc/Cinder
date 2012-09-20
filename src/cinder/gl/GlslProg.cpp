@@ -48,11 +48,14 @@ GlslProg::Obj::~Obj()
     
 	if( geometryShader ) {
 		loadShader( geometryShader->getBuffer(), GL_GEOMETRY_SHADER_EXT );
-        
+
+#if ! defined( CINDER_LINUX )
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_EXT, geometryInputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT, geometryOutputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_EXT, geometryOutputVertices);
-    }
+#endif
+
+	}
     
 	link();
 }
@@ -70,10 +73,12 @@ GlslProg::GlslProg( const char *vertexShader, const char *fragmentShader, const 
     
 	if( geometryShader ) {
 		loadShader( geometryShader, GL_GEOMETRY_SHADER_EXT );
-        
+
+#if ! defined( CINDER_LINUX )
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_EXT, geometryInputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT, geometryOutputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_EXT, geometryOutputVertices);
+#endif
     }
     
 	link();

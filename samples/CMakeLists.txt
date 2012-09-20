@@ -66,4 +66,5 @@ set(CinderSamples_LINK_LIBRARIES
 ##add_subdirectory(bspline)
 #add_subdirectory(Buddhabrot)
 #add_subdirectory(captureTest)
-add_subdirectory(ClipboardBasic)
+#add_subdirectory(ClipboardBasic)
+add_subdirectory(cubeMapping)
