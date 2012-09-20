@@ -44,6 +44,12 @@
 	#include "cinder/ip/Fill.h"
 	#include "cinder/ip/Blend.h"
 	#include <set>
+#elif defined( CINDER_LINUX )
+	#include <QApplication>
+	#include <QClipboard>
+	#include <QMimeData>
+	#include <QImage>
+	#include <QVariant>
 #endif
 
 namespace cinder {
@@ -81,6 +87,10 @@ bool Clipboard::hasString()
 	std::set<UINT> textFormats;
 	textFormats.insert( CF_TEXT ); textFormats.insert( CF_UNICODETEXT ); textFormats.insert( CF_OEMTEXT );
 	return clipboardContainsFormat( textFormats );
+#elif defined( CINDER_LINUX )
+	const QClipboard *clipboard = QApplication::clipboard();
+	const QMimeData *mimeData = clipboard->mimeData();
+	return mimeData->hasText();
 #endif
 }
 
@@ -99,6 +109,10 @@ bool Clipboard::hasImage()
 	std::set<UINT> imageFormats;
 	imageFormats.insert( CF_BITMAP ); imageFormats.insert( CF_DIB ); imageFormats.insert( CF_DIBV5 );
 	return clipboardContainsFormat( imageFormats);
+#elif defined( CINDER_LINUX )
+	const QClipboard *clipboard = QApplication::clipboard();
+	const QMimeData *mimeData = clipboard->mimeData();
+	return mimeData->hasImage();
 #endif
 }
 	
@@ -138,6 +152,11 @@ std::string	Clipboard::getString()
 	}
 	::CloseClipboard();
 	return result;
+#elif defined( CINDER_LINUX )
+	const QClipboard *clipboard = QApplication::clipboard();
+	const QMimeData *mimeData = clipboard->mimeData();
+	if( mimeData->hasText() )
+		return mimeData->text().toAscii().data();
 #endif
 }
 
@@ -173,6 +192,20 @@ ImageSourceRef Clipboard::getImage()
 	}
 	::CloseClipboard();
 	return result;
+#elif defined( CINDER_LINUX )
+	ImageSourceRef result;
+	const QClipboard *clipboard = QApplication::clipboard();
+	const QMimeData *mimeData = clipboard->mimeData();
+
+	if( mimeData->hasImage() ) {
+		QImage image = qvariant_cast<QImage> (mimeData->imageData());
+		Surface8u surface( image.width(), image.height(), image.hasAlphaChannel(), SurfaceChannelOrder::BGRA );
+		memcpy( (char *) surface.getData(), (char *) image.bits(), image.byteCount() );
+		result = ImageSourceRef( surface );
+	} else {
+		result = ImageSourceRef();
+	}
+	return result;
 #endif
 }
 
@@ -195,6 +228,9 @@ void Clipboard::setString( const std::string &str )
 	::GlobalUnlock( hglbCopy );
 	::SetClipboardData( CF_UNICODETEXT, hglbCopy ); 
 	::CloseClipboard();
+#elif defined( CINDER_LINUX )
+	 QClipboard *clipboard = QApplication::clipboard();
+	 clipboard->setText( QString( str.c_str() ) );
 #endif
 }
 
