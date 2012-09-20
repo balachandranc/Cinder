@@ -41,6 +41,12 @@
 	#include "cinder/msw/CinderMsw.h"
 	#include "cinder/msw/CinderMswGdiPlus.h"
 	#pragma comment(lib, "gdiplus")
+#elif defined( CINDER_LINUX )
+	#include <QImage>
+	#include <QPainter>
+	#include <QFont>
+	#include <QFontMetrics>
+	#include <QRect>
 #endif
 
 #include <boost/noncopyable.hpp>
@@ -120,6 +126,9 @@ struct Run {
 	// in GDI+ rendering we need to know each run's typographic metrics
 	float		mWidth;
 	float		mDescent, mLeading, mAscent;
+#elif defined( CINDER_LINUX )
+	float		mWidth;
+	float		mDescent, mLeading, mAscent;
 #endif
 };
 
@@ -137,6 +146,8 @@ class Line {
 	void render( CGContextRef &cgContext, float currentY, float xBorder, float maxWidth );
 #elif defined( CINDER_MSW )
 	void render( Gdiplus::Graphics *graphics, float currentY, float xBorder, float maxWidth );
+#elif defined( CINDER_LINUX )
+	void render( QImage *image, float currentY, float xBorder, float maxWidth );
 #endif
 
 	enum { LEFT, RIGHT, CENTERED };
@@ -213,6 +224,31 @@ void Line::calcExtents()
 		mLeading = std::max( runIt->mFont.getLeading(), mLeading );
 		mHeight = std::max( mHeight, sizeRect.Height );
 	}
+#elif defined( CINDER_LINUX )
+	mHeight = mWidth = mAscent = mDescent = mLeading = 0;
+	for( vector<Run>::iterator runIt = mRuns.begin(); runIt != mRuns.end(); ++runIt ) {
+		/*
+		Gdiplus::StringFormat format;
+		format.SetAlignment( Gdiplus::StringAlignmentNear ); format.SetLineAlignment( Gdiplus::StringAlignmentNear );
+		Gdiplus::RectF sizeRect;
+		const Gdiplus::Font *font = runIt->mFont.getGdiplusFont();
+		TextManager::instance()->getGraphics()->MeasureString( &runIt->mWideText[0], -1, font, Gdiplus::PointF( 0, 0 ), &format, &sizeRect );
+		 */
+
+		QFont font( QString( runIt->mFont.getName().c_str() ), runIt->mFont.getSize() );
+		QFontMetrics fm( font );
+
+		runIt->mWidth = fm.width( runIt->mText.c_str() );
+		runIt->mAscent = fm.ascent();
+		runIt->mDescent = fm.descent();
+		runIt->mLeading = fm.leading();
+
+		mWidth += fm.width( runIt->mText.c_str() );
+		mAscent = std::max( (float) fm.ascent(), mAscent );
+		mDescent = std::max( (float) fm.descent(), mDescent );
+		mLeading = std::max( (float) fm.leading(), mLeading );
+		mHeight = std::max( mHeight, (float) fm.height() );
+	}
 #endif
 
 	mHeight = std::max( mHeight, mAscent + mDescent + mLeading );
@@ -246,6 +282,31 @@ void Line::render( Gdiplus::Graphics *graphics, float currentY, float xBorder, f
 		graphics->DrawString( &runIt->mWideText[0], -1, font, Gdiplus::PointF( currentX, currentY + (mAscent - runIt->mAscent) ), &brush );
 		currentX += runIt->mWidth;
 	}
+}
+
+#elif defined( CINDER_LINUX )
+
+void Line::render( QImage *image, float currentY, float xBorder, float maxWidth )
+{
+	float currentX = xBorder;
+
+	if( mJustification == CENTERED )
+		currentX = ( maxWidth - mWidth ) / 2.0f;
+	else if( mJustification == RIGHT )
+		currentX = maxWidth - mWidth - xBorder;
+
+	QPainter painter( image );
+	for( vector<Run>::const_iterator runIt = mRuns.begin(); runIt != mRuns.end(); ++runIt ) {
+		ColorA8u nativeColor( runIt->mColor );
+		//Gdiplus::SolidBrush brush( Gdiplus::Color( nativeColor.a, nativeColor.r, nativeColor.g, nativeColor.b ) );
+		QFont font( QString( runIt->mFont.getName().c_str() ), runIt->mFont.getSize() );
+		painter.setFont( font );
+		painter.setPen( QColor( nativeColor.r, nativeColor.g, nativeColor.b, nativeColor.a ) );
+		//graphics->DrawString( &runIt->mWideText[0], -1, font, Gdiplus::PointF( currentX, currentY + (mAscent - runIt->mAscent) ), &brush );
+		painter.drawText( currentX, currentY, QString( runIt->mText.c_str() ) );
+		currentX += runIt->mWidth;
+	}
+
 }
 
 #endif
@@ -511,8 +572,17 @@ Surface renderString( const string &str, const Font &font, const ColorA &color, 
 	delete offscreenBitmap;
 	delete offscreenGraphics;
 #elif defined( CINDER_LINUX )
-	//TODO: implement for Qt
-	Surface result( pixelWidth, pixelHeight, true, SurfaceChannelOrder::RGBA );
+	//SCO::BGRA and QImage::Format_ARGB32 set after testing.
+	Surface result( pixelWidth, pixelHeight, true, SurfaceChannelOrder::BGRA );
+	QImage *image = new QImage( (uchar *) result.getData(), pixelWidth, pixelHeight, QImage::Format_ARGB32 );
+	ip::fill( &result, ColorA( 0, 0, 0, 0 ) );
+
+	float currentY = totalHeight;
+	//currentY -= line.mAscent + line.mLeadingOffset;
+	currentY -= line.mDescent;
+	line.render( image, currentY, (float)0, pixelWidth );
+
+	ip::unpremultiply( &result );
 #endif	
 
 	if( baselineOffset )

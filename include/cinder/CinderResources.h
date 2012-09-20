@@ -31,6 +31,8 @@
 #elif defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 	#define CINDER_RESOURCE( LOCALPREFIX, PATH, ID, TYPE ) \
 		ID,#TYPE
+#elif defined( CINDER_LINUX )
+	#define CINDER_RESOURCE( LOCALPREFIX, PATH, ID, TYPE) #LOCALPREFIX#PATH
 #else // MAC RESOURCE
 	#define CINDER_RESOURCE( LOCALPREFIX, PATH, ID, TYPE ) #PATH
 #endif
