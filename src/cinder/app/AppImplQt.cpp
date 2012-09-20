@@ -26,6 +26,7 @@
 
 #include <QFile>
 #include <QApplication>
+#include <QDir>
 
 using std::string;
 using std::wstring;
@@ -104,8 +105,11 @@ Buffer AppImplQt::loadResource( int id, const std::string &type )
 
 Buffer AppImplQt::loadResource( const std::string &relativePath )
 {
-	QFile file( QString( relativePath.c_str() ) );
-	uchar * dataPtr = file.map( 0, file.size() );
+	QString path = QCoreApplication::applicationDirPath() + QDir::separator() + QString( relativePath.c_str() );
+	QFile file( path );
+	file.open( QIODevice::ReadOnly );
+	char * dataPtr = new char[ file.size() ];
+	memcpy( dataPtr, file.readAll().data(), file.size() );
 	return Buffer( (void *) dataPtr, (size_t) file.size() );
 }
 
@@ -131,6 +135,7 @@ fs::path AppImplQt::getAppPath()
 
 	return fs::path( std::string( appPath ) );
 	*/
+	return fs::path( QCoreApplication::applicationFilePath().toStdString() );
 }
 
 fs::path AppImplQt::getOpenFilePath( const fs::path &initialPath, vector<string> extensions )

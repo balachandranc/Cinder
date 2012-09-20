@@ -42,4 +42,5 @@ add_library(cinder
 	Capture.cpp
 	CaptureImplV4l2.cpp
 	Clipboard.cpp
+	ImageSourcePng.cpp
 )

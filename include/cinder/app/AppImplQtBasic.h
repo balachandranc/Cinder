@@ -66,7 +66,6 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 	std::string getAppPath() const;
 	
 	Display*	getDisplay() { return mDisplay; }
-	bool		eventFilter( QObject *obj, QEvent *event );
 	
  public slots:
 	void		paint();

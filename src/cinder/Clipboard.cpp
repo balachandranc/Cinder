@@ -200,7 +200,7 @@ ImageSourceRef Clipboard::getImage()
 	if( mimeData->hasImage() ) {
 		QImage image = qvariant_cast<QImage> (mimeData->imageData());
 		Surface8u surface( image.width(), image.height(), image.hasAlphaChannel(), SurfaceChannelOrder::BGRA );
-		memcpy( (char *) surface.getData(), (char *) image.bits(), image.byteCount() );
+		memcpy( (char *) surface.getData(), (const char *) image.constBits(), image.byteCount() );
 		result = ImageSourceRef( surface );
 	} else {
 		result = ImageSourceRef();
@@ -291,7 +291,12 @@ void Clipboard::setImage( ImageSourceRef imageSource, ImageTarget::Options optio
 
 	::GlobalUnlock( hglbCopy );
 	::SetClipboardData( CF_DIBV5, hglbCopy ); 
-	::CloseClipboard();	
+	::CloseClipboard();
+#elif defined( CINDER_LINUX )
+	Surface8u *surface = new Surface8u( imageSource );
+	QImage image( (uchar *) surface->getData(), surface->getWidth(), surface->getHeight(), QImage::Format_ARGB32 );
+	QClipboard *clipboard = QApplication::clipboard();
+	clipboard->setImage( image );
 #endif
 }
 

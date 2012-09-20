@@ -206,7 +206,7 @@ DataSourceRef App::loadResource( int mswID, const string &mswType )
 
 DataSourceRef App::loadResource( const string &relativePath )
 {
-	return DataSourceBuffer::create( AppImplQt::loadResource( relativePath ) );
+	return DataSourceBuffer::create( AppImplQt::loadResource( relativePath ), relativePath );
 }
 
 #endif

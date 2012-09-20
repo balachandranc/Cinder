@@ -26,6 +26,7 @@
 #include "cinder/app/Renderer.h"
 #include "cinder/Utilities.h"
 
+#include <QtGui>
 #include <QRect>
 #include <QDesktopWidget>
 #include <QGLWidget>
@@ -398,21 +399,6 @@ void AppImplQtBasic::getScreenSize( int clientWidth, int clientHeight, int *resu
 	*resultHeight = clientHeight;
 }
 
-bool AppImplQtBasic::eventFilter( QObject *obj, QEvent *event )
-{
-	std::cout << "Event" << std::endl;
-	std::cout.flush();
-
-	if( event->type() == QEvent::DragMove ) {
-
-	}
-
-	std::cout << event->type() << std::endl;
-	std::cout.flush();
-
-	return false;
-}
-
 void AppImplQtBasic::paint()
 {
 	mApp->privateUpdate__();
@@ -677,6 +663,8 @@ QtEventHandler::QtEventHandler( AppImplQtBasic *aImpl): QObject(), mImpl( aImpl 
 
 bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 {
+	try {
+
 	switch( event-> type() ) {
 
 		case QEvent::KeyPress: {
@@ -777,6 +765,9 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 		}
 	}
 
+	} catch (std::exception &e) {
+		qCritical() << "Exception thrown: " << 	e.what();
+	}
 	return false;
 }
 
