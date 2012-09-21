@@ -227,14 +227,6 @@ void Line::calcExtents()
 #elif defined( CINDER_LINUX )
 	mHeight = mWidth = mAscent = mDescent = mLeading = 0;
 	for( vector<Run>::iterator runIt = mRuns.begin(); runIt != mRuns.end(); ++runIt ) {
-		/*
-		Gdiplus::StringFormat format;
-		format.SetAlignment( Gdiplus::StringAlignmentNear ); format.SetLineAlignment( Gdiplus::StringAlignmentNear );
-		Gdiplus::RectF sizeRect;
-		const Gdiplus::Font *font = runIt->mFont.getGdiplusFont();
-		TextManager::instance()->getGraphics()->MeasureString( &runIt->mWideText[0], -1, font, Gdiplus::PointF( 0, 0 ), &format, &sizeRect );
-		 */
-
 		QFont font( QString( runIt->mFont.getName().c_str() ), runIt->mFont.getSize() );
 		QFontMetrics fm( font );
 
@@ -473,28 +465,22 @@ Surface	TextLayout::render( bool useAlpha, bool premultiplied )
 
 	delete offscreenBitmap;
 	delete offscreenGraphics;
+
 #elif defined( CINDER_LINUX )
+
 	result = Surface( pixelWidth, pixelHeight, useAlpha, (useAlpha)?SurfaceChannelOrder::RGBA:SurfaceChannelOrder::RGBX );
-	//CGContextRef cgContext = cocoa::createCgBitmapContext( result );
 	QImage image( (uchar *) result.getData(), pixelWidth, pixelHeight, QImage::Format_ARGB32 );
 
 	ip::fill( &result, mBackgroundColor.premultiplied() );
 
-	float currentY = totalHeight + 1.0f + mVerticalBorder;
+	// walk the lines and render them, advancing our Y offset along the way
+	float currentY = (float)mVerticalBorder;
 	for( deque<shared_ptr<Line> >::iterator lineIt = mLines.begin(); lineIt != mLines.end(); ++lineIt ) {
-		// these are negated from Cinder's normal pixel coordinate system
-		currentY -= (*lineIt)->mAscent + (*lineIt)->mLeadingOffset;
-		(*lineIt)->render( &image, currentY, (float)mHorizontalBorder, pixelWidth );
-		currentY += -(*lineIt)->mDescent - (*lineIt)->mLeading;
+		currentY += (*lineIt)->mHeight - (*lineIt)->mDescent;
+		(*lineIt)->render( &image, currentY, (float)mHorizontalBorder, (float)pixelWidth );
+		//TODO: check whether this is the correct leading to be applied.
+		currentY += (*lineIt)->mLeading;
 	}
-
-	// force all the rendering to finish and release the context
-	//CGContextFlush( cgContext );
-	//CGContextRelease( cgContext );
-
-	// since CGContextBitmaps are always premultiplied, if the caller didn't want that we'll have to undo it
-	if( ! premultiplied )
-		ip::unpremultiply( &result );
 
 #endif
 
@@ -597,13 +583,13 @@ Surface renderString( const string &str, const Font &font, const ColorA &color, 
 #elif defined( CINDER_LINUX )
 	//SCO::BGRA and QImage::Format_ARGB32 set after testing.
 	Surface result( pixelWidth, pixelHeight, true, SurfaceChannelOrder::BGRA );
-	QImage *image = new QImage( (uchar *) result.getData(), pixelWidth, pixelHeight, QImage::Format_ARGB32 );
+	QImage image( (uchar *) result.getData(), pixelWidth, pixelHeight, QImage::Format_ARGB32 );
 	ip::fill( &result, ColorA( 0, 0, 0, 0 ) );
 
 	float currentY = totalHeight;
 	//currentY -= line.mAscent + line.mLeadingOffset;
 	currentY -= line.mDescent;
-	line.render( image, currentY, (float)0, pixelWidth );
+	line.render( &image, currentY, (float)0, pixelWidth );
 
 	ip::unpremultiply( &result );
 #endif	
