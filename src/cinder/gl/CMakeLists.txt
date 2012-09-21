@@ -5,4 +5,5 @@ add_library( gl
 	DisplayList.cpp
 	GlslProg.cpp
 	Material.cpp
+	TileRender.cpp
 )

@@ -36,6 +36,10 @@
 	typedef cinder::IStreamUrlImplCurl		IStreamUrlPlatformImpl;
 #endif
 
+#if defined( CINDER_LINUX )
+	#include <QString>
+#endif
+
 namespace cinder {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +64,8 @@ std::string Url::encode( const std::string &unescaped )
 	std::wstring wideUnescaped = toUtf16( unescaped );
 	UrlEscape( wideUnescaped.c_str(), buffer, &bufferSize, 0 );
 	return toUtf8( std::wstring( buffer ) );
+#elif defined( CINDER_LINUX )
+	return QString( unescaped.c_str() ).toUtf8().data();
 #endif	
 }
 

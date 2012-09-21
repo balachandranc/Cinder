@@ -472,7 +472,30 @@ Surface	TextLayout::render( bool useAlpha, bool premultiplied )
 	GdiFlush();
 
 	delete offscreenBitmap;
-	delete offscreenGraphics;		
+	delete offscreenGraphics;
+#elif defined( CINDER_LINUX )
+	result = Surface( pixelWidth, pixelHeight, useAlpha, (useAlpha)?SurfaceChannelOrder::RGBA:SurfaceChannelOrder::RGBX );
+	//CGContextRef cgContext = cocoa::createCgBitmapContext( result );
+	QImage image( (uchar *) result.getData(), pixelWidth, pixelHeight, QImage::Format_ARGB32 );
+
+	ip::fill( &result, mBackgroundColor.premultiplied() );
+
+	float currentY = totalHeight + 1.0f + mVerticalBorder;
+	for( deque<shared_ptr<Line> >::iterator lineIt = mLines.begin(); lineIt != mLines.end(); ++lineIt ) {
+		// these are negated from Cinder's normal pixel coordinate system
+		currentY -= (*lineIt)->mAscent + (*lineIt)->mLeadingOffset;
+		(*lineIt)->render( &image, currentY, (float)mHorizontalBorder, pixelWidth );
+		currentY += -(*lineIt)->mDescent - (*lineIt)->mLeading;
+	}
+
+	// force all the rendering to finish and release the context
+	//CGContextFlush( cgContext );
+	//CGContextRelease( cgContext );
+
+	// since CGContextBitmaps are always premultiplied, if the caller didn't want that we'll have to undo it
+	if( ! premultiplied )
+		ip::unpremultiply( &result );
+
 #endif
 
 	return result;

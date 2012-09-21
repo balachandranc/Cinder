@@ -443,6 +443,8 @@ std::ostream& App::console()
 	if( ! mOutputStream )
 		mOutputStream = shared_ptr<cinder::msw::dostream>( new cinder::msw::dostream );
 	return *mOutputStream;
+#elif defined( CINDER_LINUX )
+	return std::cout;
 #endif
 }
 
