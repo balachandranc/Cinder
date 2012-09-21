@@ -1,0 +1,3 @@
+include_directories(include)
+add_executable(FBOMultipleTargets src/FBOMultipleTargetsApp.cpp)
+target_link_libraries(FBOMultipleTargets ${CinderSamples_LINK_LIBRARIES})

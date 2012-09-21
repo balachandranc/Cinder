@@ -72,4 +72,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(Earthquake)
 #add_subdirectory(EaseGallery)
 #add_subdirectory(eventTest)
-add_subdirectory(FBOBasic)
+#add_subdirectory(FBOBasic)
+add_subdirectory(FBOMultipleTargets)
