@@ -49,7 +49,11 @@ GlslProg::Obj::~Obj()
 	if( geometryShader ) {
 		loadShader( geometryShader->getBuffer(), GL_GEOMETRY_SHADER_EXT );
 
-#if ! defined( CINDER_LINUX )
+#if defined( CINDER_LINUX )
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_ARB, geometryInputType);
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_ARB, geometryOutputType);
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_ARB, geometryOutputVertices);
+#else
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_EXT, geometryInputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT, geometryOutputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_EXT, geometryOutputVertices);
@@ -74,7 +78,11 @@ GlslProg::GlslProg( const char *vertexShader, const char *fragmentShader, const 
 	if( geometryShader ) {
 		loadShader( geometryShader, GL_GEOMETRY_SHADER_EXT );
 
-#if ! defined( CINDER_LINUX )
+#if defined( CINDER_LINUX )
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_ARB, geometryInputType);
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_ARB, geometryOutputType);
+        glProgramParameteriARB(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_ARB, geometryOutputVertices);
+#else
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_INPUT_TYPE_EXT, geometryInputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_OUTPUT_TYPE_EXT, geometryOutputType);
         glProgramParameteriEXT(mObj->mHandle, GL_GEOMETRY_VERTICES_OUT_EXT, geometryOutputVertices);
