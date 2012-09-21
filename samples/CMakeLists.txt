@@ -69,4 +69,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(ClipboardBasic)
 ##add_subdirectory(cubeMapping)
 #add_subdirectory(Earthquake)
-add_subdirectory(EaseGallery)
+#add_subdirectory(EaseGallery)
+add_subdirectory(eventTest)
