@@ -6,4 +6,5 @@ add_library( gl
 	GlslProg.cpp
 	Material.cpp
 	TileRender.cpp
+	Fbo.cpp
 )

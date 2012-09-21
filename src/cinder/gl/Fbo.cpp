@@ -38,6 +38,10 @@ GLint Fbo::sMaxAttachments = -1;
 	#define GL_SUFFIX(sym) sym##EXT
 #endif
 
+#if defined( CINDER_LINUX )
+	#define glBlitFramebufferEXT glBlitFramebuffer
+#endif
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // RenderBuffer::Obj
 Renderbuffer::Obj::Obj()

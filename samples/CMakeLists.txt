@@ -57,6 +57,7 @@ set(CinderSamples_LINK_LIBRARIES
 	${QT_LIBRARIES}
 	${CURL_LIBRARIES}
 	${Boost_LIBRARIES}
+	/usr/lib/i386-linux-gnu/libGLEW.so.1.6
 )
 
 #add_subdirectory(basicApp)
@@ -70,4 +71,5 @@ set(CinderSamples_LINK_LIBRARIES
 ##add_subdirectory(cubeMapping)
 #add_subdirectory(Earthquake)
 #add_subdirectory(EaseGallery)
-add_subdirectory(eventTest)
+#add_subdirectory(eventTest)
+add_subdirectory(FBOBasic)
