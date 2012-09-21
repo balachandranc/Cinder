@@ -73,4 +73,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(EaseGallery)
 #add_subdirectory(eventTest)
 #add_subdirectory(FBOBasic)
-add_subdirectory(FBOMultipleTargets)
+#add_subdirectory(FBOMultipleTargets)
+add_subdirectory(flickrTest)

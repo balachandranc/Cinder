@@ -1,6 +1,6 @@
 #include "cinder/Cinder.h"
 #include "cinder/app/AppBasic.h"
-#include "cinder/URL.h"
+#include "cinder/Url.h"
 #include "cinder/Xml.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/Texture.h"
