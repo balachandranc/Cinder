@@ -77,4 +77,5 @@ set(CinderSamples_LINK_LIBRARIES
 ##add_subdirectory(flickrTest)
 ##add_subdirectory(fontSample)
 #add_subdirectory(FrustumCulling)
-add_subdirectory(GLSLLighting)
+#add_subdirectory(GLSLLighting)
+add_subdirectory(HodginParticles)
