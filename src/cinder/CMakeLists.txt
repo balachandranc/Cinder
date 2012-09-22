@@ -44,4 +44,5 @@ add_library(cinder
 	Clipboard.cpp
 	ImageSourcePng.cpp
 	Xml.cpp
+	Color.cpp
 )

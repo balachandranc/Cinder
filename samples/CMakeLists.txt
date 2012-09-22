@@ -76,4 +76,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(FBOMultipleTargets)
 ##add_subdirectory(flickrTest)
 ##add_subdirectory(fontSample)
-add_subdirectory(FrustumCulling)
+#add_subdirectory(FrustumCulling)
+add_subdirectory(GLSLLighting)
