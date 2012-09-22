@@ -46,4 +46,5 @@ add_library(cinder
 	Xml.cpp
 	Color.cpp
 	ImageTargetFileQt.cpp
+	ImageSourceFileQt.cpp
 )

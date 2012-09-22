@@ -32,7 +32,7 @@
 #elif defined( CINDER_COCOA )
 	#include "cinder/cocoa/CinderCocoa.h"
 #elif defined( CINDER_LINUX )
-	#include "cinder/ImageSourcePng.h"
+	#include "cinder/ImageSourceFileQt.h"
 	#include "cinder/ImageTargetFileQt.h"
 #endif
 
