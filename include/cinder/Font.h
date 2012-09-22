@@ -43,6 +43,9 @@
 	namespace Gdiplus {
 		class Font;
 	}
+#elif defined( CINDER_LINUX )
+	#include <QFontMetrics>
+	#include <QFont>
 #endif
 
 namespace cinder {
@@ -113,6 +116,9 @@ class Font {
 		std::shared_ptr<Gdiplus::Font>	mGdiplusFont;
 		std::vector<std::pair<uint16_t,uint16_t> >	mUnicodeRanges;
 		size_t					mNumGlyphs;
+#elif defined( CINDER_LINUX )
+		QFont					*qFont;
+		QFontMetrics			*fontMetrics;
 #endif 		
 	};
 
