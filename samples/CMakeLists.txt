@@ -84,4 +84,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(ImageHeightField)
 #add_subdirectory(imageWriterSample)
 #add_subdirectory(ListenerBasic)
-add_subdirectory(MandelbrotGLSL)
+#add_subdirectory(MandelbrotGLSL)
+add_subdirectory(NormalMapping)
