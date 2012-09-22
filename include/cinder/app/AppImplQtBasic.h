@@ -28,6 +28,7 @@
 #include <QGLWidget>
 #include <QObject>
 #include <QEvent>
+#include <QTimer>
 
 namespace cinder { namespace app {
 
@@ -82,20 +83,14 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 	bool		mHasBeenInitialized;
 	class AppBasic	*mApp;
 	
-	// Windows window variables
-	/*
-	HWND					mWnd;
-	HDC						mDC;
-	HINSTANCE				mInstance;
-	DWORD					mWindowStyle, mWindowExStyle;
-	*/
+	// Qt window variables
 	double					mNextFrameTime;
 	Display					*mDisplay;
 	QGLWidget				*mWindow;
+	QTimer					*mAnimationTimer;
+
 	/*
 	std::map<DWORD,Vec2f>	mMultiTouchPrev;
-
-	friend LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 	*/
 	friend class QtEventHandler;
 };

@@ -351,6 +351,8 @@ fs::path App::getOpenFilePath( const fs::path &initialPath, vector<string> exten
 		return string();
 #elif defined( CINDER_MSW )
 	return AppImplMsw::getOpenFilePath( initialPath, extensions );
+#elif defined( CINDER_LINUX )
+	return AppImplQt::getOpenFilePath( initialPath, extensions );
 #else
 	return string();
 #endif
@@ -381,6 +383,8 @@ fs::path App::getFolderPath( const fs::path &initialPath )
 		return string();
 #elif defined( CINDER_MSW )
 	return AppImplMsw::getFolderPath( initialPath );
+#elif defined( CINDER_LINUX )
+	return AppImplQt::getFolderPath( initialPath );
 #else
 	return string();
 #endif
@@ -430,6 +434,8 @@ fs::path App::getSaveFilePath( const fs::path &initialPath, vector<string> exten
 		return string();
 #elif defined( CINDER_MSW )
 	return AppImplMsw::getSaveFilePath( initialPath, extensions );
+#elif defined( CINDER_LINUX )
+	return AppImplQt::getSaveFilePath( initialPath, extensions );
 #else
 	return string();
 #endif

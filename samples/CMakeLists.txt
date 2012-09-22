@@ -79,4 +79,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(FrustumCulling)
 #add_subdirectory(GLSLLighting)
 #add_subdirectory(HodginParticles)
-add_subdirectory(HodginParticlesRedux)
+#add_subdirectory(HodginParticlesRedux)
+add_subdirectory(ImageFileBasic)

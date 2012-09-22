@@ -22,7 +22,6 @@
 
 #include "cinder/app/AppImplQtBasic.h"
 #include "cinder/app/AppBasic.h"
-//#include "cinder/app/AppImplQtRendererGl.h"
 #include "cinder/app/Renderer.h"
 #include "cinder/Utilities.h"
 
@@ -106,9 +105,9 @@ void AppImplQtBasic::run()
 	 */
 
 	int frameUpdateDelayMs = (int) ( 1000.0f / mFrameRate );
-	QTimer *timer = new QTimer();
-	connect ( timer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
-	timer->start( frameUpdateDelayMs );
+	mAnimationTimer = new QTimer();
+	connect ( mAnimationTimer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
+	mAnimationTimer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
 	mWindow->setFocus();
@@ -379,7 +378,10 @@ void AppImplQtBasic::setWindowSize( int aWindowWidth, int aWindowHeight )
 
 float AppImplQtBasic::setFrameRate( float aFrameRate )
 {
-	return aFrameRate;
+	mFrameRate = aFrameRate;
+	int frameUpdateDelayMs = (int) ( 1000.0f / mFrameRate );
+	mAnimationTimer->start( frameUpdateDelayMs );
+	return mFrameRate;
 }
 
 void AppImplQtBasic::getScreenSize( int clientWidth, int clientHeight, int *resultWidth, int *resultHeight )
