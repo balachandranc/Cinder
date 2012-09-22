@@ -47,4 +47,6 @@ add_library(cinder
 	Color.cpp
 	ImageTargetFileQt.cpp
 	ImageSourceFileQt.cpp
+	ObjLoader.cpp
+	Sphere.cpp
 )
