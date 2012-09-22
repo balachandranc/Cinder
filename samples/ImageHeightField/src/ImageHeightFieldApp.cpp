@@ -1,5 +1,5 @@
 #include "cinder/app/AppBasic.h"
-#include "cinder/ArcBall.h"
+#include "cinder/Arcball.h"
 #include "cinder/Rand.h"
 #include "cinder/Camera.h"
 #include "cinder/Surface.h"

@@ -80,4 +80,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(GLSLLighting)
 #add_subdirectory(HodginParticles)
 #add_subdirectory(HodginParticlesRedux)
-add_subdirectory(ImageFileBasic)
+#add_subdirectory(ImageFileBasic)
+add_subdirectory(ImageHeightField)
