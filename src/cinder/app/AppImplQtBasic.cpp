@@ -249,6 +249,7 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 
 	mWindow = new QGLWidget( /*NULL, NULL, Qt::FramelessWindowHint*/ );
 	mWindow->setGeometry( rect );
+	mWindow->setAcceptDrops( true );
 	mWindow->show();
 	mWindow->setWindowTitle( QString( mApp->getSettings().getTitle().c_str() ) );
 
@@ -765,6 +766,27 @@ bool QtEventHandler::eventFilter( QObject *obj, QEvent *event )
 
 			break;
 		}
+
+		case QEvent::DragEnter: {
+			QDragEnterEvent *dragEnterEvent = static_cast<QDragEnterEvent *>( event );
+			dragEnterEvent->acceptProposedAction();
+			break;
+		}
+
+		case QEvent::Drop: {
+			QDropEvent *dropEvent = static_cast<QDropEvent *>( event );
+			if( !dropEvent->mimeData()->hasUrls() )
+				break;
+			vector<fs::path> files;
+			QList<QUrl> urls = dropEvent->mimeData()->urls();
+			for( QList<QUrl>::const_iterator urlIt = urls.begin(); urlIt != urls.end(); ++urlIt ) {
+				files.push_back( urlIt->path().toStdString() );
+			}
+			QPoint pos = dropEvent->pos();
+			mApp->privateFileDrop__( FileDropEvent( pos.x(), pos.y(), files ) );
+			break;
+		}
+
 	}
 
 	} catch (std::exception &e) {
