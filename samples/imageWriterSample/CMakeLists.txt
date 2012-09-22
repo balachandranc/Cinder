@@ -1,0 +1,4 @@
+add_executable(imageWriterSample
+	imageWriterSample.cpp
+)
+target_link_libraries(imageWriterSample ${CinderSamples_LINK_LIBRARIES})
