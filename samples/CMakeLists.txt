@@ -86,4 +86,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(ListenerBasic)
 #add_subdirectory(MandelbrotGLSL)
 #add_subdirectory(NormalMapping)
-add_subdirectory(OBJLoaderDemo)
+#add_subdirectory(OBJLoaderDemo)
+add_subdirectory(OpenGLLighting)
