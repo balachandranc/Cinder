@@ -95,4 +95,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(Picking3D)
 #add_subdirectory(QuaternionAccum)
 #add_subdirectory(rayMarcher)
-add_subdirectory(RDiffusion)
+#add_subdirectory(RDiffusion)
+add_subdirectory(resizeTest)
