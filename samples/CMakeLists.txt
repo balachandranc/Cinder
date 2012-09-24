@@ -93,4 +93,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(ParamsBasic)
 ##add_subdirectory(perlinTest)
 #add_subdirectory(Picking3D)
-add_subdirectory(QuaternionAccum)
+#add_subdirectory(QuaternionAccum)
+add_subdirectory(rayMarcher)
