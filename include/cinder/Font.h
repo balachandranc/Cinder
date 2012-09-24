@@ -92,6 +92,9 @@ class Font {
 	::HFONT					getHfont() const { return mObj->mHfont; }
 	const Gdiplus::Font*	getGdiplusFont() const { return mObj->mGdiplusFont.get(); }
 	static HDC				getGlobalDc();
+#elif defined( CINDER_LINUX )
+	const QFont*			getQFont() const { return mObj->qFont; }
+	const QFontMetrics*		getFontMetrics() const { return mObj->fontMetrics; }
 #endif
 
  private:

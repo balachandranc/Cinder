@@ -154,6 +154,10 @@ class TextBox {
 	void			calculate() const;
 
 	mutable std::wstring	mWideText;
+#elif defined( CINDER_LINUX )
+	void			calculate() const;
+
+	mutable QString			mQText;
 #endif
 };
 

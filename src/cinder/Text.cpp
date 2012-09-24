@@ -844,6 +844,135 @@ Surface	TextBox::render( Vec2f offset )
 	return result;
 }
 
-#endif // defined( CINDER_MSW )
+#elif defined( CINDER_LINUX )
+
+
+void TextBox::calculate() const
+{
+	if( ! mInvalid )
+		return;
+	const float MAX_SIZE = 1000000.0f;
+
+	if( mText.empty() ) {
+		mCalculatedSize = Vec2f::zero();
+		return;
+	}
+	mQText = QString::fromStdString( mText );
+
+	int flags = ( mAlign == TextBox::CENTER ) ? Qt::AlignHCenter : ( mAlign == TextBox::RIGHT ) ? Qt::AlignRight : Qt::AlignLeft;
+	const QFontMetrics *fontMetrics = mFont.getFontMetrics();
+
+	QRect sizeRect( 0, 0, ( mSize.x <= 0 ) ? MAX_SIZE : mSize.x, ( mSize.y <= 0 ) ? MAX_SIZE : mSize.y );
+	QRect outRect = fontMetrics->boundingRect( sizeRect, flags, mQText );
+
+	mCalculatedSize.x = outRect.width();
+	mCalculatedSize.y = outRect.height();
+
+	mInvalid = false;
+}
+
+
+Vec2f TextBox::measure() const
+{
+	calculate();
+	return mCalculatedSize;
+}
+
+/*
+vector<pair<uint16_t,Vec2f> > TextBox::measureGlyphs() const
+{
+	vector<pair<uint16_t,Vec2f> > result;
+
+	if( mText.empty() )
+		return result;
+
+	GCP_RESULTSW gcpResults;
+	WCHAR *glyphIndices = NULL;
+	int *dx = NULL;
+
+	::SelectObject( Font::getGlobalDc(), mFont.getHfont() );
+	mWideText = toUtf16( mText );
+
+	gcpResults.lStructSize = sizeof (gcpResults);
+	gcpResults.lpOutString = NULL;
+	gcpResults.lpOrder = NULL;
+	gcpResults.lpCaretPos = NULL;
+	gcpResults.lpClass = NULL;
+
+	uint32_t bufferSize = std::max<uint32_t>( mWideText.length() * 1.2, 16);		// Initially guess number of chars plus a few
+	while( true ) {
+		if( glyphIndices ) {
+			free( glyphIndices );
+			glyphIndices = NULL;
+		}
+		if( dx ) {
+			free( dx );
+			dx = NULL;
+		}
+
+		glyphIndices = (WCHAR*)malloc( bufferSize * sizeof(WCHAR) );
+		dx = (int*)malloc( bufferSize * sizeof(int) );
+		gcpResults.nGlyphs = bufferSize;
+		gcpResults.lpDx = dx;
+		gcpResults.lpGlyphs = glyphIndices;
+
+		if( ! ::GetCharacterPlacementW( Font::getGlobalDc(), &mWideText[0], mWideText.length(), 0,
+						&gcpResults, GCP_DIACRITIC | GCP_LIGATE | GCP_GLYPHSHAPE | GCP_REORDER ) ) {
+			return vector<pair<uint16_t,Vec2f> >(); // failure
+		}
+
+		if( gcpResults.lpDx && gcpResults.lpGlyphs )
+			break;
+
+		// Too small a buffer, try again
+		bufferSize += bufferSize / 2;
+		if( bufferSize > INT_MAX) {
+			return vector<pair<uint16_t,Vec2f> >(); // failure
+		}
+	}
+
+	int xPos = 0;
+	for( int i = 0; i < gcpResults.nGlyphs; i++ ) {
+		result.push_back( std::make_pair( glyphIndices[i], Vec2f( xPos, 0 ) ) );
+		xPos += dx[i];
+	}
+
+	if( glyphIndices )
+		free( glyphIndices );
+	if( dx )
+		free( dx );
+
+	return result;
+}
+*/
+
+Surface	TextBox::render( Vec2f offset )
+{
+	calculate();
+
+	float sizeX = ( mSize.x <= 0 ) ? mCalculatedSize.x : mSize.x;
+	float sizeY = ( mSize.y <= 0 ) ? mCalculatedSize.y : mSize.y;
+	sizeX = math<float>::ceil( sizeX );
+	sizeY = math<float>::ceil( sizeY );
+
+	sizeY += 1;
+
+	Surface result( (int)sizeX, (int)sizeY, true, SurfaceChannelOrder::BGRA );
+	result.setPremultiplied( mPremultiplied );
+	QImage image( (uchar *) result.getData(), (int)sizeX, (int)sizeY, QImage::Format_ARGB32 );
+	ip::fill( &result, mBackgroundColor );
+
+	QPainter painter( &image );
+
+	painter.setPen( QColor::fromRgbF( mColor.r, mColor.g, mColor.b, mColor.a ) );
+	painter.setFont( *mFont.getQFont() );
+	int flags = ( mAlign == TextBox::CENTER ) ? Qt::AlignHCenter : ( mAlign == TextBox::RIGHT ) ? Qt::AlignRight : Qt::AlignLeft;
+	painter.drawText( offset.x, offset.y, sizeX, sizeY, flags, mQText );
+
+	return result;
+}
+
+
+#endif // defined( CINDER_LINUX )
 
 } // namespace cinder
