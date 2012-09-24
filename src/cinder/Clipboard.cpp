@@ -156,7 +156,7 @@ std::string	Clipboard::getString()
 	const QClipboard *clipboard = QApplication::clipboard();
 	const QMimeData *mimeData = clipboard->mimeData();
 	if( mimeData->hasText() )
-		return mimeData->text().toAscii().data();
+		return mimeData->text().toStdString();
 #endif
 }
 

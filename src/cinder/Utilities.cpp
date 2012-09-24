@@ -75,7 +75,7 @@ fs::path expandPath( const fs::path &path )
 	result = buffer; 
 #elif defined( CINDER_LINUX )
 	QFileInfo fileInfo = QFileInfo( QString( path.string().c_str() ));
-	result = fileInfo.canonicalFilePath().toAscii().constData();
+	result = fileInfo.canonicalFilePath().toStdString();
 #endif
 
 	return fs::path( result );
@@ -95,7 +95,7 @@ std::string getHomeDirectory()
 	result = buffer;
 	result += "\\";
 #elif defined( CINDER_LINUX )
-	result = QDir::homePath().toAscii().constData();
+	result = QDir::homePath().toStdString() + "/";
 #endif
 
 	return result;
@@ -115,7 +115,7 @@ std::string getDocumentsDirectory()
 	result = buffer;
 	result += "\\";
 #elif defined ( CINDER_LINUX )
-	result = QDir::home().absoluteFilePath( QString("Documents") ).toAscii().constData();
+	result = QDir::home().absoluteFilePath( QString("Documents") ).toStdString() + "/";
 #endif
 
 	return result;
@@ -139,7 +139,7 @@ std::string getTemporaryDirectory()
 	std::wstring wideResult( tempPath.begin(), tempPath.begin() + static_cast<std::size_t>(result) );
 	return toUtf8( wideResult );
 #elif defined( CINDER_LINUX )
-	return QDir::tempPath().toAscii().constData();
+	return QDir::tempPath().toStdString() + "/";
 #endif
 }
 
@@ -166,7 +166,7 @@ std::string getTemporaryFilePath( const std::string &prefix )
 
 	return toUtf8( tempFileName );
 #elif defined( CINDER_LINUX )
-	return QDir::temp().absoluteFilePath( QString( prefix.c_str() )).toAscii().constData();
+	return QDir::temp().absoluteFilePath( QString( prefix.c_str() )).toStdString();
 #endif
 }
 
@@ -291,9 +291,7 @@ wstring toUtf16( const string &utf8 )
 
 #elif defined( CINDER_LINUX )
 	QString qString = QString::fromUtf8( utf8.c_str() );
-	wchar_t *array = new wchar_t[ qString.length() ];
-	qString.toWCharArray( array );
-	return wstring( array );
+	return qString.toStdWString();
 #else
 	NSString *utf8NS = [NSString stringWithCString:utf8.c_str() encoding:NSUTF8StringEncoding];
 	return wstring( reinterpret_cast<const wchar_t*>( [utf8NS cStringUsingEncoding:NSUTF16LittleEndianStringEncoding] ) );
@@ -318,7 +316,7 @@ string toUtf8( const wstring &utf16 )
 
 	return string( &resultString[0] );
 #elif defined( CINDER_LINUX )
-	return QString::fromWCharArray( utf16.c_str() ).toAscii().constData();
+	return QString::fromStdWString( utf16 ).toStdString();
 #else
 	NSString *utf16NS = [NSString stringWithCString:reinterpret_cast<const char*>( utf16.c_str() ) encoding:NSUTF16LittleEndianStringEncoding];
 	return string( [utf16NS cStringUsingEncoding:NSUTF8StringEncoding] );	

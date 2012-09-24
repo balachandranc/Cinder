@@ -97,4 +97,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(rayMarcher)
 #add_subdirectory(RDiffusion)
 #add_subdirectory(resizeTest)
-add_subdirectory(rotatingBox)
+#add_subdirectory(rotatingBox)
+add_subdirectory(SaveImage)
