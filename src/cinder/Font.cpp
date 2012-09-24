@@ -753,6 +753,7 @@ Font::Obj::Obj(DataSourceRef dataSource, float size) :
 	QByteArray byteArray( (const char *) buffer.getData(), buffer.getDataSize() );
 	int fontID = fontDatabase.addApplicationFontFromData( byteArray );
 	QString fontName = fontDatabase.applicationFontFamilies( fontID ).first();
+	mName = fontName.toStdString();
 	qFont = new QFont( fontName, size );
 	fontMetrics = new QFontMetrics( *qFont );
 #endif

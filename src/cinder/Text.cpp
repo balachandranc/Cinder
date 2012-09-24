@@ -290,12 +290,11 @@ void Line::render( QImage *image, float currentY, float xBorder, float maxWidth 
 	QPainter painter( image );
 	for( vector<Run>::const_iterator runIt = mRuns.begin(); runIt != mRuns.end(); ++runIt ) {
 		ColorA8u nativeColor( runIt->mColor );
-		//Gdiplus::SolidBrush brush( Gdiplus::Color( nativeColor.a, nativeColor.r, nativeColor.g, nativeColor.b ) );
-		QFont font( QString( runIt->mFont.getName().c_str() ), runIt->mFont.getSize() );
-		painter.setFont( font );
+		std::cout << "setting font: " << runIt->mFont.getQFont()->family().toStdString() << std::endl;
+		std::cout.flush();
+		painter.setFont( *runIt->mFont.getQFont() );
 		painter.setPen( QColor( nativeColor.r, nativeColor.g, nativeColor.b, nativeColor.a ) );
-		//graphics->DrawString( &runIt->mWideText[0], -1, font, Gdiplus::PointF( currentX, currentY + (mAscent - runIt->mAscent) ), &brush );
-		painter.drawText( currentX, currentY, QString( runIt->mText.c_str() ) );
+		painter.drawText( currentX, currentY, QString::fromUtf8( runIt->mText.c_str() ) );
 		currentX += runIt->mWidth;
 	}
 
@@ -476,7 +475,7 @@ Surface	TextLayout::render( bool useAlpha, bool premultiplied )
 	// walk the lines and render them, advancing our Y offset along the way
 	float currentY = (float)mVerticalBorder;
 	for( deque<shared_ptr<Line> >::iterator lineIt = mLines.begin(); lineIt != mLines.end(); ++lineIt ) {
-		currentY += (*lineIt)->mHeight - (*lineIt)->mDescent;
+		currentY += (*lineIt)->mLeadingOffset + (*lineIt)->mHeight - (*lineIt)->mDescent;
 		(*lineIt)->render( &image, currentY, (float)mHorizontalBorder, (float)pixelWidth );
 		//TODO: check whether this is the correct leading to be applied.
 		currentY += (*lineIt)->mLeading;
@@ -857,7 +856,7 @@ void TextBox::calculate() const
 		mCalculatedSize = Vec2f::zero();
 		return;
 	}
-	mQText = QString::fromStdString( mText );
+	mQText = QString::fromUtf8( mText.c_str() );
 
 	int flags = ( mAlign == TextBox::CENTER ) ? Qt::AlignHCenter : ( mAlign == TextBox::RIGHT ) ? Qt::AlignRight : Qt::AlignLeft;
 	const QFontMetrics *fontMetrics = mFont.getFontMetrics();

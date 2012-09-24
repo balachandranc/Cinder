@@ -37,6 +37,10 @@ void TextTestApp::setup()
 	std::string normalFont( "Arial" );
 	std::string boldFont( "Arial-BoldMT" );
 	std::string differentFont( "AmericanTypewriter" );
+#elif defined( CINDER_LINUX )
+	std::string normalFont( "Arial" );
+	std::string boldFont( "Arial Bold" );
+	std::string differentFont( "Ubuntu" );
 #else
 	std::string normalFont( "Arial" );
 	std::string boldFont( "Arial Bold" );
