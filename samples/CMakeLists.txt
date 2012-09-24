@@ -101,4 +101,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(SaveImage)
 #add_subdirectory(SerialCommunication)
 #add_subdirectory(shaderTest)
-add_subdirectory(shadowMap)
+#add_subdirectory(shadowMap)
+add_subdirectory(slerpBasic)
