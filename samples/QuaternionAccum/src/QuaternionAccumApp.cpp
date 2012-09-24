@@ -4,7 +4,7 @@
 #include "cinder/gl/gl.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/gl/Texture.h"
-#include "cinder/Bspline.h"
+#include "cinder/BSpline.h"
 #include "cinder/Rand.h"
 #include "cinder/Camera.h"
 #include "cinder/ImageIo.h"

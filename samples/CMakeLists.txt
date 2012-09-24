@@ -92,4 +92,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(OpenGLLighting)
 #add_subdirectory(ParamsBasic)
 ##add_subdirectory(perlinTest)
-add_subdirectory(Picking3D)
+#add_subdirectory(Picking3D)
+add_subdirectory(QuaternionAccum)
