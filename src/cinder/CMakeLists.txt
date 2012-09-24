@@ -50,4 +50,5 @@ add_library(cinder
 	ImageSourceFileQt.cpp
 	ObjLoader.cpp
 	Sphere.cpp
+	Serial.cpp
 )

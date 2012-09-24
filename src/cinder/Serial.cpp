@@ -29,7 +29,7 @@
 #include <iostream>
 #include <fcntl.h>
 
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	#include <termios.h>
 	#include <sys/ioctl.h>
 	#include <getopt.h>
@@ -55,7 +55,7 @@ Serial::Serial( const Serial::Device &device, int baudRate )
 Serial::Obj::Obj( const Serial::Device &device, int baudRate )
 	: mDevice( device )
 {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	mFd = open( ( "/dev/" + device.getName() ).c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK );
 	if( mFd == -1 ) {
 		throw SerialExcOpenFailed();
@@ -71,7 +71,9 @@ Serial::Obj::Obj( const Serial::Device &device, int baudRate )
 	baudToConstant[4800] = B4800;
 	baudToConstant[9600] = B9600;			
 	baudToConstant[19200] = B19200;
+#if ! defined( CINDER_LINUX )
 	baudToConstant[28800] = B28800;
+#endif
 	baudToConstant[38400] = B38400;
 	baudToConstant[57600] = B57600;
 	baudToConstant[115200] = B115200;
@@ -148,7 +150,7 @@ const std::vector<Serial::Device>& Serial::getDevices( bool forceRefresh )
 
 	sDevices.clear();
 
-#if defined( CINDER_MAC )	
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	::DIR *dir;
 	::dirent *entry;
 	dir = ::opendir( "/dev" );
@@ -211,7 +213,7 @@ const std::vector<Serial::Device>& Serial::getDevices( bool forceRefresh )
 
 Serial::Obj::~Obj()
 {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	// restore the termios from before we opened the port
 	::tcsetattr( mFd, TCSANOW, &mSavedOptions );
 	::close( mFd );
@@ -231,7 +233,7 @@ void Serial::writeBytes( const void *data, size_t numBytes )
 	size_t totalBytesWritten = 0;
 	
 	while( totalBytesWritten < numBytes ) {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 		int bytesWritten = ::write( mObj->mFd, data, numBytes - totalBytesWritten );
 		if( ( bytesWritten == -1 ) && ( errno != EAGAIN ) )
 			throw SerialExcReadFailure();	
@@ -248,7 +250,7 @@ void Serial::readBytes( void *data, size_t numBytes )
 {
 	size_t totalBytesRead = 0;
 	while( totalBytesRead < numBytes ) {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 		int bytesRead = ::read( mObj->mFd, data, numBytes - totalBytesRead );
 		if( ( bytesRead == -1 ) && ( errno != EAGAIN ) )
 			throw SerialExcReadFailure();
@@ -266,7 +268,7 @@ void Serial::readBytes( void *data, size_t numBytes )
 
 size_t Serial::readAvailableBytes( void *data, size_t maximumBytes )
 {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	int bytesRead = ::read( mObj->mFd, data, maximumBytes );
 #elif defined( CINDER_MSW )
 	::DWORD bytesRead = 0;
@@ -341,7 +343,7 @@ size_t Serial::getNumBytesAvailable() const
 {
 	int result;
 	
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	::ioctl( mObj->mFd, FIONREAD, &result );
 #elif defined( CINDER_MSW )
 	::COMSTAT status;
@@ -357,7 +359,7 @@ size_t Serial::getNumBytesAvailable() const
 	
 void Serial::flush( bool input, bool output )
 {
-#if defined( CINDER_MAC )
+#if defined( CINDER_MAC ) || defined( CINDER_LINUX )
 	int queue;
 	if( input && output )
 		queue = TCIOFLUSH;
