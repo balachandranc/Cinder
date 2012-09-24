@@ -47,6 +47,7 @@
 	#include <QFont>
 	#include <QFontMetrics>
 	#include <QRect>
+	#include <QGlyphRun>
 #endif
 
 #include <boost/noncopyable.hpp>
@@ -290,8 +291,6 @@ void Line::render( QImage *image, float currentY, float xBorder, float maxWidth 
 	QPainter painter( image );
 	for( vector<Run>::const_iterator runIt = mRuns.begin(); runIt != mRuns.end(); ++runIt ) {
 		ColorA8u nativeColor( runIt->mColor );
-		std::cout << "setting font: " << runIt->mFont.getQFont()->family().toStdString() << std::endl;
-		std::cout.flush();
 		painter.setFont( *runIt->mFont.getQFont() );
 		painter.setPen( QColor( nativeColor.r, nativeColor.g, nativeColor.b, nativeColor.a ) );
 		painter.drawText( currentX, currentY, QString::fromUtf8( runIt->mText.c_str() ) );
@@ -858,14 +857,32 @@ void TextBox::calculate() const
 	}
 	mQText = QString::fromUtf8( mText.c_str() );
 
-	int flags = ( mAlign == TextBox::CENTER ) ? Qt::AlignHCenter : ( mAlign == TextBox::RIGHT ) ? Qt::AlignRight : Qt::AlignLeft;
+	QTextOption option = ( mAlign == TextBox::CENTER ) ? QTextOption( Qt::AlignHCenter ) :
+			( mAlign == TextBox::RIGHT ) ? QTextOption( Qt::AlignRight ) : QTextOption( Qt::AlignLeft );
 	const QFontMetrics *fontMetrics = mFont.getFontMetrics();
 
-	QRect sizeRect( 0, 0, ( mSize.x <= 0 ) ? MAX_SIZE : mSize.x, ( mSize.y <= 0 ) ? MAX_SIZE : mSize.y );
-	QRect outRect = fontMetrics->boundingRect( sizeRect, flags, mQText );
+	double maxWidth = ( mSize.x <= 0 ) ? MAX_SIZE : mSize.x;
 
-	mCalculatedSize.x = outRect.width();
-	mCalculatedSize.y = outRect.height();
+	mTextLayout = new QTextLayout( mQText );
+
+	int leading = fontMetrics->leading();
+	qreal height = 0;
+
+	mTextLayout->beginLayout();
+	while( true ) {
+		QTextLine line = mTextLayout->createLine();
+		if ( !line.isValid() )
+			break;
+		line.setLineWidth( maxWidth );
+		height += leading;
+		line.setPosition( QPointF( 0, height ) );
+		height += line.height();
+	}
+	mTextLayout->endLayout();
+
+	QRectF size = mTextLayout->boundingRect();
+	mCalculatedSize.x = size.width();
+	mCalculatedSize.y = size.height();
 
 	mInvalid = false;
 }
@@ -877,73 +894,24 @@ Vec2f TextBox::measure() const
 	return mCalculatedSize;
 }
 
-/*
+
 vector<pair<uint16_t,Vec2f> > TextBox::measureGlyphs() const
 {
+	calculate();
+
 	vector<pair<uint16_t,Vec2f> > result;
 
-	if( mText.empty() )
-		return result;
-
-	GCP_RESULTSW gcpResults;
-	WCHAR *glyphIndices = NULL;
-	int *dx = NULL;
-
-	::SelectObject( Font::getGlobalDc(), mFont.getHfont() );
-	mWideText = toUtf16( mText );
-
-	gcpResults.lStructSize = sizeof (gcpResults);
-	gcpResults.lpOutString = NULL;
-	gcpResults.lpOrder = NULL;
-	gcpResults.lpCaretPos = NULL;
-	gcpResults.lpClass = NULL;
-
-	uint32_t bufferSize = std::max<uint32_t>( mWideText.length() * 1.2, 16);		// Initially guess number of chars plus a few
-	while( true ) {
-		if( glyphIndices ) {
-			free( glyphIndices );
-			glyphIndices = NULL;
-		}
-		if( dx ) {
-			free( dx );
-			dx = NULL;
-		}
-
-		glyphIndices = (WCHAR*)malloc( bufferSize * sizeof(WCHAR) );
-		dx = (int*)malloc( bufferSize * sizeof(int) );
-		gcpResults.nGlyphs = bufferSize;
-		gcpResults.lpDx = dx;
-		gcpResults.lpGlyphs = glyphIndices;
-
-		if( ! ::GetCharacterPlacementW( Font::getGlobalDc(), &mWideText[0], mWideText.length(), 0,
-						&gcpResults, GCP_DIACRITIC | GCP_LIGATE | GCP_GLYPHSHAPE | GCP_REORDER ) ) {
-			return vector<pair<uint16_t,Vec2f> >(); // failure
-		}
-
-		if( gcpResults.lpDx && gcpResults.lpGlyphs )
-			break;
-
-		// Too small a buffer, try again
-		bufferSize += bufferSize / 2;
-		if( bufferSize > INT_MAX) {
-			return vector<pair<uint16_t,Vec2f> >(); // failure
-		}
+	QList<QGlyphRun> glyphRuns = mTextLayout->glyphRuns();
+	for( QList<QGlyphRun>::const_iterator glyphRunIt = glyphRuns.begin(); glyphRunIt != glyphRuns.end(); ++glyphRunIt ) {
+		QVector<quint32> indexes = glyphRunIt->glyphIndexes();
+		QVector<QPointF> positions = glyphRunIt->positions();
+		for (int i = 0; i < indexes.size(); ++i )
+			result.push_back( make_pair( indexes[i], Vec2f( positions[i].x(), positions[i].y() ) ) );
 	}
-
-	int xPos = 0;
-	for( int i = 0; i < gcpResults.nGlyphs; i++ ) {
-		result.push_back( std::make_pair( glyphIndices[i], Vec2f( xPos, 0 ) ) );
-		xPos += dx[i];
-	}
-
-	if( glyphIndices )
-		free( glyphIndices );
-	if( dx )
-		free( dx );
 
 	return result;
 }
-*/
+
 
 Surface	TextBox::render( Vec2f offset )
 {
@@ -965,8 +933,7 @@ Surface	TextBox::render( Vec2f offset )
 
 	painter.setPen( QColor::fromRgbF( mColor.r, mColor.g, mColor.b, mColor.a ) );
 	painter.setFont( *mFont.getQFont() );
-	int flags = ( mAlign == TextBox::CENTER ) ? Qt::AlignHCenter : ( mAlign == TextBox::RIGHT ) ? Qt::AlignRight : Qt::AlignLeft;
-	painter.drawText( offset.x, offset.y, sizeX, sizeY, flags, mQText );
+	mTextLayout->draw( &painter, QPoint( 0 + offset.x, 0 + offset.y ) );
 
 	return result;
 }

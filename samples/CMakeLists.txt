@@ -104,5 +104,6 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(shadowMap)
 #add_subdirectory(slerpBasic)
 #add_subdirectory(SurfaceBasic)
-#add_subdirectory(TextBox)
-add_subdirectory(TextTest)
+add_subdirectory(TextBox)
+#add_subdirectory(TextTest)
+#add_subdirectory(TextureFont)

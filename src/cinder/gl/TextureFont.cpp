@@ -33,6 +33,10 @@
 	#if defined( CINDER_MAC )
 		#include <ApplicationServices/ApplicationServices.h>
 	#endif
+#elif defined( CINDER_LINUX )
+	#include <QPoint>
+	#include <QImage>
+	#include <QPainter>
 #endif
 
 #include <set>
@@ -280,7 +284,118 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 
 	delete [] pBuff;
 }
+
+#elif defined( CINDER_LINUX )
+
+TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Format &format )
+	: mFont( font ), mFormat( format )
+{
+
+	// get the glyph indices we'll need
+	vector<Font::Glyph>	tempGlyphs = font.getGlyphs( utf8Chars );
+	set<Font::Glyph> glyphs( tempGlyphs.begin(), tempGlyphs.end() );
+	// determine the max glyph extents
+	Vec2f glyphExtents = Vec2f::zero();
+	for( set<Font::Glyph>::const_iterator glyphIt = glyphs.begin(); glyphIt != glyphs.end(); ++glyphIt ) {
+		Rectf bb = font.getGlyphBoundingBox( *glyphIt );
+		glyphExtents.x = std::max( glyphExtents.x, bb.getWidth() );
+		glyphExtents.y = std::max( glyphExtents.y, bb.getHeight() );
+	}
+
+	glyphExtents.x = ceil( glyphExtents.x );
+	glyphExtents.y = ceil( glyphExtents.y );
+
+	int glyphsWide = floor( mFormat.getTextureWidth() / (glyphExtents.x+3) );
+	int glyphsTall = floor( mFormat.getTextureHeight() / (glyphExtents.y+5) );
+	uint8_t curGlyphIndex = 0, curTextureIndex = 0;
+	Vec2i curOffset = Vec2i::zero();
+
+	Font::Glyph renderGlyphs[glyphsWide*glyphsTall];
+	QPoint renderPositions[glyphsWide*glyphsTall];
+
+	Surface surface( mFormat.getTextureWidth(), mFormat.getTextureHeight(), true );
+	ip::fill( &surface, ColorA8u( 0, 0, 0, 0 ) );
+	ColorA white( 1, 1, 1, 1 );
+	/*
+	::CGContextRef cgContext = cocoa::createCgBitmapContext( surface );
+	::CGContextSetRGBFillColor( cgContext, 1, 1, 1, 1 );
+	::CGContextSetFont( cgContext, font.getCgFontRef() );
+	::CGContextSetFontSize( cgContext, font.getSize() );
+	::CGContextSetTextMatrix( cgContext, CGAffineTransformIdentity );
+	 */
+	QImage image( (uchar *) surface.getData(), surface.getWidth(), surface.getHeight(), QImage::Format_ARGB32 );
+	ip::fill( &surface, ColorA( 1, 1, 1, 1 ) );
+	QPainter painter( &image );
+	painter.setFont( *font.getQFont() );
+
+
+#if defined( CINDER_GLES )
+	std::shared_ptr<uint8_t> lumAlphaData( new uint8_t[mFormat.getTextureWidth()*mFormat.getTextureHeight()*2], checked_array_deleter<uint8_t>() );
 #endif
+
+
+	for( set<Font::Glyph>::const_iterator glyphIt = glyphs.begin(); glyphIt != glyphs.end(); ) {
+		GlyphInfo newInfo;
+		newInfo.mTextureIndex = curTextureIndex;
+		Rectf bb = font.getGlyphBoundingBox( *glyphIt );
+		Vec2f ul = curOffset + Vec2f( 0, glyphExtents.y - bb.getHeight() );
+		Vec2f lr = curOffset + Vec2f( glyphExtents.x, glyphExtents.y );
+		newInfo.mTexCoords = Area( floor( ul.x ), floor( ul.y ), ceil( lr.x ) + 3, ceil( lr.y ) + 2 );
+		newInfo.mOriginOffset.x = floor(bb.x1) - 1;
+		newInfo.mOriginOffset.y = -(bb.getHeight()-1)-ceil( bb.y1+0.5f );
+		mGlyphMap[*glyphIt] = newInfo;
+		renderGlyphs[curGlyphIndex] = *glyphIt;
+		renderPositions[curGlyphIndex].setX( curOffset.x - floor(bb.x1) + 1 );
+		renderPositions[curGlyphIndex].setY( surface.getHeight() - (curOffset.y + glyphExtents.y) - ceil(bb.y1+0.5f) );
+		curOffset += Vec2i( glyphExtents.x + 3, 0 );
+		++glyphIt;
+		if( ( ++curGlyphIndex == glyphsWide * glyphsTall ) || ( glyphIt == glyphs.end() ) ) {
+			//::CGContextShowGlyphsAtPositions( cgContext, renderGlyphs, renderPositions, curGlyphIndex );
+
+			for( int i = 0; i < curGlyphIndex; i++)
+				painter.drawText( renderPositions[i], QString::fromUtf16( renderGlyphs + i ) );
+
+			// pass premultiply and mipmapping preferences to Texture::Format
+			if( ! mFormat.getPremultiply() )
+				ip::unpremultiply( &surface );
+
+			gl::Texture::Format textureFormat = gl::Texture::Format();
+			textureFormat.enableMipmapping( mFormat.hasMipmapping() );
+			textureFormat.setInternalFormat( GL_LUMINANCE_ALPHA );
+			/*
+#if defined( CINDER_GLES )
+			// under iOS format and interalFormat must match, so let's make a block of LUMINANCE_ALPHA data
+			Surface8u::ConstIter iter( surface, surface.getBounds() );
+			size_t offset = 0;
+			while( iter.line() ) {
+				while( iter.pixel() ) {
+					lumAlphaData.get()[offset+0] = iter.r();
+					lumAlphaData.get()[offset+1] = iter.a();
+					offset += 2;
+				}
+			}
+			mTextures.push_back( gl::Texture( lumAlphaData.get(), GL_LUMINANCE_ALPHA, mFormat.getTextureWidth(), mFormat.getTextureHeight(), textureFormat ) );
+#else
+			mTextures.push_back( gl::Texture( surface, textureFormat ) );
+#endif
+*/
+			mTextures.push_back( gl::Texture( surface, textureFormat ) );
+
+			ip::fill( &surface, ColorA8u( 0, 0, 0, 0 ) );
+			curOffset = Vec2i::zero();
+			curGlyphIndex = 0;
+			++curTextureIndex;
+		}
+		else if( ( curGlyphIndex ) % glyphsWide == 0 ) { // wrap around
+			curOffset.x = 0;
+			curOffset.y += glyphExtents.y + 2;
+		}
+	}
+
+}
+
+
+#endif //CINDER_LINUX
 
 void TextureFont::drawGlyphs( const vector<pair<uint16_t,Vec2f> > &glyphMeasures, const Vec2f &baselineIn, const DrawOptions &options, const std::vector<ColorA8u> &colors )
 {

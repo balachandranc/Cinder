@@ -36,7 +36,11 @@
 #if defined( CINDER_COCOA )
 typedef struct __CTFrame;
 typedef struct __CTLine;
+#elif defined( CINDER_LINUX )
+	#include <QString>
+	#include <QTextLayout>
 #endif
+
 
 namespace cinder {
 
@@ -158,6 +162,7 @@ class TextBox {
 	void			calculate() const;
 
 	mutable QString			mQText;
+	mutable QTextLayout				*mTextLayout;
 #endif
 };
 

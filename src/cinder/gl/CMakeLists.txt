@@ -8,5 +8,5 @@ add_library( gl
 	TileRender.cpp
 	Fbo.cpp
 	Light.cpp
-	#TextureFont.cpp
+	TextureFont.cpp
 )
