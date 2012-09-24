@@ -90,4 +90,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(NormalMapping)
 #add_subdirectory(OBJLoaderDemo)
 #add_subdirectory(OpenGLLighting)
-add_subdirectory(ParamsBasic)
+#add_subdirectory(ParamsBasic)
+##add_subdirectory(perlinTest)
