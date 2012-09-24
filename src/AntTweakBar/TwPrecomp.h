@@ -76,7 +76,14 @@
 #   include <shellapi.h>
 #endif
 
-#include "cinder/gl/gl.h"
+#if defined( _UNIX )
+	#undef CursorShape
+	#include "cinder/gl/gl.h"
+	#define CursorShape 0
+#else
+	#include "cinder/gl/gl.h"
+#endif
+
 #define  ANT_OGL_HEADER_INCLUDED
 
 

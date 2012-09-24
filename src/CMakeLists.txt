@@ -33,8 +33,10 @@ include_directories(
 	"/usr/include/boost"
 	/usr/include/cairo
 	"${CINDER_ROOT}/libtess2"
+	"${CINDER_ROOT}/AntTweakBar"
 	${QT_INCLUDES}
 )
 
 add_subdirectory(cinder)
 add_subdirectory(libtess2)
+add_subdirectory(AntTweakBar)

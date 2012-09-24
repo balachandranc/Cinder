@@ -38,7 +38,9 @@ set(CINDER_LIBRARIES
 	${CINDER_LIB_DIR}/cairo/libcairo.a
 	${CINDER_LIB_DIR}/libcinder.a
 	${CINDER_LIB_DIR}/ip/libip.a
-	${CINDER_LIB_DIR}/../libtess2/libtess2.a 
+	${CINDER_LIB_DIR}/params/libparams.a
+	${CINDER_LIB_DIR}/../libtess2/libtess2.a
+	${CINDER_LIB_DIR}/../AntTweakBar/libAntTweakBar.a
 	)
 
 set(CAIRO_LIBRARIES
@@ -87,4 +89,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(MandelbrotGLSL)
 #add_subdirectory(NormalMapping)
 #add_subdirectory(OBJLoaderDemo)
-add_subdirectory(OpenGLLighting)
+#add_subdirectory(OpenGLLighting)
+add_subdirectory(ParamsBasic)

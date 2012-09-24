@@ -2,6 +2,7 @@ add_subdirectory(app)
 add_subdirectory(gl)
 add_subdirectory(ip)
 add_subdirectory(cairo)
+add_subdirectory(params)
 include_directories(${CINDER_INCLUDE_DIRS})
 message(" my message ${CINDER_INCLUDE_DIRS}")
 
