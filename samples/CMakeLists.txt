@@ -99,4 +99,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(resizeTest)
 #add_subdirectory(rotatingBox)
 #add_subdirectory(SaveImage)
-add_subdirectory(SerialCommunication)
+#add_subdirectory(SerialCommunication)
+add_subdirectory(shaderTest)
