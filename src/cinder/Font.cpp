@@ -652,7 +652,8 @@ Rectf Font::getGlyphBoundingBox( Glyph glyphIndex ) const
 			*/
 	QRawFont rawFont = QRawFont::fromFont( *mObj->qFont );
 	QRectF rect = rawFont.pathForGlyph( glyphIndex ).toFillPolygon( QTransform() ).boundingRect();
-	return Rectf( rect.topLeft().x(), rect.topLeft().y(), rect.bottomRight().x(), rect.bottomRight().y() );
+	//return Rectf( rect.topLeft().x(), rect.topLeft().y(), rect.bottomRight().x(), rect.bottomRight().y() );
+	return Rectf( 0, 0, rect.bottomRight().x() - rect.topLeft().x(), rect.bottomRight().y() - rect.topLeft().y() );
 }
 
 #endif

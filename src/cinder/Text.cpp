@@ -902,11 +902,17 @@ vector<pair<uint16_t,Vec2f> > TextBox::measureGlyphs() const
 	vector<pair<uint16_t,Vec2f> > result;
 
 	QList<QGlyphRun> glyphRuns = mTextLayout->glyphRuns();
+	int lineNum = 0;
 	for( QList<QGlyphRun>::const_iterator glyphRunIt = glyphRuns.begin(); glyphRunIt != glyphRuns.end(); ++glyphRunIt ) {
 		QVector<quint32> indexes = glyphRunIt->glyphIndexes();
 		QVector<QPointF> positions = glyphRunIt->positions();
-		for (int i = 0; i < indexes.size(); ++i )
-			result.push_back( make_pair( indexes[i], Vec2f( positions[i].x(), positions[i].y() ) ) );
+		cout << "line position: " << mTextLayout->lineAt( lineNum ).position().y() << std::endl;
+		for (int i = 0; i < indexes.size(); ++i ) {
+			result.push_back( make_pair( indexes[i], Vec2f( positions[i].x(), positions[i].y() + mTextLayout->lineAt( lineNum ).position().y()) ) );
+			std::cout << i << ": ind: " << indexes[i] << " x: " << positions[i].x() << " y: " << positions[i].y() + mTextLayout->lineAt( lineNum ).position().y()<< std::endl;
+		}
+		std::cout.flush();
+		lineNum++;
 	}
 
 	return result;

@@ -305,10 +305,14 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 	glyphExtents.x = ceil( glyphExtents.x );
 	glyphExtents.y = ceil( glyphExtents.y );
 
+	std::cout << "Extents x: " << glyphExtents.x << " y: " << glyphExtents.y << std::endl;
+
 	int glyphsWide = floor( mFormat.getTextureWidth() / (glyphExtents.x+3) );
 	int glyphsTall = floor( mFormat.getTextureHeight() / (glyphExtents.y+5) );
 	uint8_t curGlyphIndex = 0, curTextureIndex = 0;
 	Vec2i curOffset = Vec2i::zero();
+
+	std::cout << "wide: " << glyphsWide << " tall: " << glyphsTall << std::endl;
 
 	Font::Glyph renderGlyphs[glyphsWide*glyphsTall];
 	QPoint renderPositions[glyphsWide*glyphsTall];
@@ -324,9 +328,10 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 	::CGContextSetTextMatrix( cgContext, CGAffineTransformIdentity );
 	 */
 	QImage image( (uchar *) surface.getData(), surface.getWidth(), surface.getHeight(), QImage::Format_ARGB32 );
-	ip::fill( &surface, ColorA( 1, 1, 1, 1 ) );
+	//ip::fill( &surface, ColorA( 1, 1, 1, 1 ) );
 	QPainter painter( &image );
 	painter.setFont( *font.getQFont() );
+	painter.setPen( QColor::fromRgbF( 1, 1, 1, 1) );
 
 
 #if defined( CINDER_GLES )
@@ -338,6 +343,8 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 		GlyphInfo newInfo;
 		newInfo.mTextureIndex = curTextureIndex;
 		Rectf bb = font.getGlyphBoundingBox( *glyphIt );
+		std::cout << "x: " << bb.x1 << " y: " << bb.y1 << " w: " << bb.getWidth() << " h: " << bb.getHeight() << std::endl;
+		//std::cout.flush();
 		Vec2f ul = curOffset + Vec2f( 0, glyphExtents.y - bb.getHeight() );
 		Vec2f lr = curOffset + Vec2f( glyphExtents.x, glyphExtents.y );
 		newInfo.mTexCoords = Area( floor( ul.x ), floor( ul.y ), ceil( lr.x ) + 3, ceil( lr.y ) + 2 );
@@ -352,8 +359,16 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 		if( ( ++curGlyphIndex == glyphsWide * glyphsTall ) || ( glyphIt == glyphs.end() ) ) {
 			//::CGContextShowGlyphsAtPositions( cgContext, renderGlyphs, renderPositions, curGlyphIndex );
 
-			for( int i = 0; i < curGlyphIndex; i++)
-				painter.drawText( renderPositions[i], QString::fromUtf16( renderGlyphs + i ) );
+			for( int i = 0; i < curGlyphIndex; i++) {
+				painter.drawText( renderPositions[i], QString::fromUtf16( renderGlyphs + i, 1 ) );
+				//std::cout << i << ": Glyph: " << QString::fromUtf16( renderGlyphs + i , 1).toStdString() << " x: " << renderPositions[i].x() << " y: " << renderPositions[i].y() << std::endl;
+				//std::cout << i << ": x: " << bb.x1 << " y: " << bb.y1 << " w: " << bb.getWidth() << " h: " << bb.getHeight() << std::endl;
+				//std::cout.flush();
+				//std::stringstream name;
+				//name << "/tmp/glyphs/glyph" << i << ".png";
+				//writeImage( name.str(), surface );
+			}
+			writeImage( "/tmp/glyphs/g.png", surface );
 
 			// pass premultiply and mipmapping preferences to Texture::Format
 			if( ! mFormat.getPremultiply() )
@@ -597,7 +612,8 @@ void TextureFont::drawString( const std::string &str, const Vec2f &baseline, con
 
 void TextureFont::drawString( const std::string &str, const Rectf &fitRect, const Vec2f &offset, const DrawOptions &options )
 {
-	TextBox tbox = TextBox().font( mFont ).text( str ).size( TextBox::GROW, fitRect.getHeight() ).ligate( options.getLigate() );
+	//TextBox tbox = TextBox().font( mFont ).text( str ).size( TextBox::GROW, fitRect.getHeight() ).ligate( options.getLigate() );
+	TextBox tbox = TextBox().font( mFont ).text( str ).size( fitRect.getWidth(), fitRect.getHeight() ).ligate( options.getLigate() );
 	vector<pair<uint16_t,Vec2f> > glyphMeasures = tbox.measureGlyphs();
 	drawGlyphs( glyphMeasures, fitRect, fitRect.getUpperLeft() + offset, options );	
 }
