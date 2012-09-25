@@ -110,4 +110,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(Triangulation)
 #add_subdirectory(Tubular)
 #add_subdirectory(VBOSample)
-add_subdirectory(VoronoiGpu)
+#add_subdirectory(VoronoiGpu)
+add_subdirectory(waterSim)
