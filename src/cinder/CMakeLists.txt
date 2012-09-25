@@ -51,4 +51,5 @@ add_library(cinder
 	ObjLoader.cpp
 	Sphere.cpp
 	Serial.cpp
+	Matrix.cpp
 )

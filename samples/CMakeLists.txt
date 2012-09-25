@@ -107,4 +107,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(TextBox)
 #add_subdirectory(TextTest)
 #add_subdirectory(TextureFont)
-add_subdirectory(Triangulation)
+#add_subdirectory(Triangulation)
+add_subdirectory(Tubular)
