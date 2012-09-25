@@ -109,4 +109,5 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(TextureFont)
 #add_subdirectory(Triangulation)
 #add_subdirectory(Tubular)
-add_subdirectory(VBOSample)
+#add_subdirectory(VBOSample)
+add_subdirectory(VoronoiGpu)
