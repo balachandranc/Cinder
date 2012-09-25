@@ -552,75 +552,6 @@ vector<Font::Glyph> Font::getGlyphs( const string &utf8String ) const
 
 Shape2d Font::getGlyphShape( Glyph glyphIndex ) const
 {
-	/*	Shape2d resultShape;
-	static const MAT2 matrix = { {0, 1}, {0, 0}, {0, 0}, {0, -1}};
-	GLYPHMETRICS metrics;
-	DWORD bytesGlyph = ::GetGlyphOutlineW( FontManager::instance()->getFontDc(), glyphIndex,
-			GGO_NATIVE | GGO_GLYPH_INDEX, &metrics, 0, NULL, &matrix);
-
-	if( bytesGlyph == GDI_ERROR )
-	throw FontGlyphFailureExc();
-
-	std::shared_ptr<uint8_t> buffer( new uint8_t[bytesGlyph], checked_array_deleter<uint8_t>() );
-	uint8_t *ptr = buffer.get();
-	if( ! buffer ) {
-		throw FontGlyphFailureExc();
-	}
-
-	if( ::GetGlyphOutlineW( FontManager::instance()->getFontDc(), glyphIndex,
-					GGO_NATIVE | GGO_GLYPH_INDEX, &metrics, bytesGlyph, buffer.get(), &matrix) == GDI_ERROR ) {
-		throw FontGlyphFailureExc();
-	}
-
-	// This whole block is modified from code in Cairo's cairo-win32-font.c
-	resultShape.clear();
-	while( ptr < buffer.get() + bytesGlyph ) {
-		TTPOLYGONHEADER *header = (TTPOLYGONHEADER *)ptr;
-		unsigned char *endPoly = ptr + header->cb;
-
-		ptr += sizeof( TTPOLYGONHEADER );
-
-		resultShape.moveTo( msw::toVec2f( header->pfxStart ) );
-		while( ptr < endPoly ) {
-			TTPOLYCURVE *curve = reinterpret_cast<TTPOLYCURVE*>( ptr );
-			POINTFX *points = curve->apfx;
-			switch( curve->wType ) {
-				case TT_PRIM_LINE:
-				for( int i = 0; i < curve->cpfx; i++ ) {
-					resultShape.lineTo( msw::toVec2f( points[i] ) );
-				}
-				break;
-				case TT_PRIM_QSPLINE:
-				for( int i = 0; i < curve->cpfx - 1; i++ ) {
-					Vec2f p1 = resultShape.getCurrentPoint(), p2;
-					Vec2f c = msw::toVec2f( points[i] ), c1, c2;
-					if( i + 1 == curve->cpfx - 1 ) {
-						p2 = msw::toVec2f( points[i + 1] );
-					}
-					else {
-						// records with more than one curve use interpolation for control points, per http://support.microsoft.com/kb/q87115/
-						p2 = ( c + msw::toVec2f( points[i + 1] ) ) / 2.0f;
-					}
-
-					c1 = 2.0f * c / 3.0f + p1 / 3.0f;
-					c2 = 2.0f * c / 3.0f + p2 / 3.0f;
-					resultShape.curveTo( c1, c2, p2 );
-				}
-				break;
-				case TT_PRIM_CSPLINE:
-				for( int i = 0; i < curve->cpfx - 2; i += 2 ) {
-					resultShape.curveTo( msw::toVec2f( points[i] ), msw::toVec2f( points[i + 1] ),
-							msw::toVec2f( points[i + 2] ) );
-				}
-				break;
-			}
-			ptr += sizeof( TTPOLYCURVE ) + sizeof( POINTFX ) * (curve->cpfx - 1);
-		}
-		resultShape.close();
-	}
-
-	return resultShape;*/
-
 	Shape2d resultShape;
 	QRawFont rawFont = QRawFont::fromFont( *mObj->qFont );
 	QPolygonF polygon = rawFont.pathForGlyph( glyphIndex ).toFillPolygon( QTransform() );
@@ -630,7 +561,6 @@ Shape2d Font::getGlyphShape( Glyph glyphIndex ) const
 	for( ; pointIt != polygon.end(); ++pointIt ) {
 		resultShape.lineTo( Vec2f( pointIt->x(), pointIt->y() ) );
 	}
-
 	resultShape.close();
 	return resultShape;
 }
