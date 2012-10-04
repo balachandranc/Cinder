@@ -79,7 +79,7 @@ class CaptureImplV4l2 {
 	bool								mIsCapturing;
 	std::shared_ptr<class SurfaceCache>	mSurfaceCache;
 
-	int32_t				mWidth, mHeight, mFormat;
+	int32_t				mWidth, mHeight, mFormat, mFrameSize;
 	mutable uint32_t	mNumBuffers;
 	mutable struct buffer *mBuffers;
 	mutable Surface8u	mCurrentFrame;
@@ -94,10 +94,11 @@ class CaptureImplV4l2 {
 	static int xioctl( int fh, int request, void *arg );
 	void initMmap( int fd, const char *devName, uint32_t *nBuffers );
 	static int openDevice( const char *devName );
+	static std::string loadName( int fd );
 	static bool isCaptureDevice( int fd );
 	void initDevice( int fd, const char *devName, int *width, int *height, int32_t *format, uint32_t *nBuffers );
 	void startCapturing( int fd, uint32_t *nBuffers );
-	static int readFrame( int fd, uint32_t *nBuffers );
+	int readFrame( int fd, uint32_t *nBuffers ) const;
 	void stopCapturing( int fd );
 	void uninitDevice( uint32_t *nBuffers );
 	void closeDevice( int fd );

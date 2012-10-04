@@ -32,6 +32,7 @@
 #include <sys/ioctl.h>
 
 #include <linux/videodev2.h>
+#include <libv4l2.h>
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define MAX_VIDEO_DEVICES 5
@@ -146,7 +147,7 @@ int CaptureImplV4l2::xioctl( int fh, int request, void *arg )
         int r;
 
         do {
-                r = ioctl(fh, request, arg);
+                r = ::v4l2_ioctl(fh, request, arg);
         } while (-1 == r && EINTR == errno);
 
         return r;
@@ -202,7 +203,7 @@ void CaptureImplV4l2::initMmap( int fd, const char *devName, uint32_t *nBuffers 
 
                 mBuffers[*nBuffers].length = buf.length;
                 mBuffers[*nBuffers].start =
-                        mmap(NULL /* start anywhere */,
+                        ::v4l2_mmap(NULL /* start anywhere */,
                               buf.length,
                               PROT_READ | PROT_WRITE /* required */,
                               MAP_SHARED /* recommended */,
@@ -230,7 +231,7 @@ int CaptureImplV4l2::openDevice( const char *devName )
                 return -1;
         }
 
-        fd = open(devName, O_RDWR /* required */ | O_NONBLOCK, 0);
+        fd = ::v4l2_open(devName, O_RDWR | O_NONBLOCK, 0);
 
         if (-1 == fd) {
                 fprintf(stderr, "Cannot open '%s': %d, %s\n",
@@ -239,6 +240,17 @@ int CaptureImplV4l2::openDevice( const char *devName )
         }
 
         return fd;
+}
+
+std::string CaptureImplV4l2::loadName( int fd ) {
+    struct v4l2_capability caps;
+
+    if (-1 == ioctl( fd, VIDIOC_QUERYCAP, &caps ) ) {
+    	perror( "VIDIOC_QUERYCAP" );
+    	exit (EXIT_FAILURE);
+    }
+
+    return (const char *)caps.card;
 }
 
 bool CaptureImplV4l2::isCaptureDevice( int fd )
@@ -310,49 +322,18 @@ void CaptureImplV4l2::initDevice( int fd, const char *devName, int *width, int *
 
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-        /*
-        struct v4l2_fmtdesc enum_fmt;
-        enum_fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        for( int i = 0;; ++i ) {
-        	enum_fmt.index = i;
-        	if ( -1 == xioctl( fd, VIDIOC_ENUM_FMT, &enum_fmt ) )
-        		break;
-        }
-         */
 
         int force_format = 1;
         if (force_format) {
                 fmt.fmt.pix.width       = *width;
                 fmt.fmt.pix.height      = *height;
-                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                //fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
-                fmt.fmt.pix.field       = V4L2_FIELD_NONE;
+                fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR24;
+                //fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+                fmt.fmt.pix.field       = V4L2_FIELD_INTERLACED;
+                //fmt.fmt.pix.field       = V4L2_FIELD_NONE;
 
                 if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
                         errnoExit("VIDIOC_S_FMT");
-
-
-                if( fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_YUYV && fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY ) {
-                    fmt.fmt.pix.width       = *width;
-                    fmt.fmt.pix.height      = *height;
-                    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
-                    fmt.fmt.pix.field       = V4L2_FIELD_NONE;
-
-                    if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                            errnoExit("VIDIOC_S_FMT");
-                }
-
-                if( fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_YUYV &&
-                		fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY &&
-                		fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_BGR24 ) {
-                    fmt.fmt.pix.width       = *width;
-                    fmt.fmt.pix.height      = *height;
-                    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_BGR32;
-                    fmt.fmt.pix.field       = V4L2_FIELD_NONE;
-
-                    if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                            errnoExit("VIDIOC_S_FMT");
-                }
 
                 *width = fmt.fmt.pix.width;
                 *height = fmt.fmt.pix.height;
@@ -397,7 +378,7 @@ void CaptureImplV4l2::startCapturing( int fd, uint32_t *nBuffers )
         	errnoExit( "VIDIOC_STREAMON" );
 }
 
-int CaptureImplV4l2::readFrame( int fd, uint32_t *nBuffers )
+int CaptureImplV4l2::readFrame( int fd, uint32_t *nBuffers ) const
 {
         struct v4l2_buffer buf;
 
@@ -441,7 +422,7 @@ void CaptureImplV4l2::stopCapturing( int fd )
 void CaptureImplV4l2::uninitDevice( uint32_t *nBuffers )
 {
         for( int i = 0; i < *nBuffers; ++i)
-        	if( -1 == munmap( mBuffers[i].start, mBuffers[i].length ) )
+        	if( -1 == ::v4l2_munmap( mBuffers[i].start, mBuffers[i].length ) )
         		errnoExit( "munmap" );
 
         free( mBuffers );
@@ -449,7 +430,7 @@ void CaptureImplV4l2::uninitDevice( uint32_t *nBuffers )
 
 void CaptureImplV4l2::closeDevice( int fd )
 {
-        if (-1 == close(fd))
+        if (-1 == ::v4l2_close(fd))
                 errnoExit( "close" );
 }
 
@@ -484,8 +465,8 @@ const vector<Capture::DeviceRef>& CaptureImplV4l2::getDevices( bool forceRefresh
 		if( fd == -1 )
 			continue;
 		if( isCaptureDevice( fd ) ) {
+			sDevices.push_back( Capture::DeviceRef( new CaptureImplV4l2::Device( loadName( fd ), i ) ) );
 			close( fd );
-			sDevices.push_back( Capture::DeviceRef( new CaptureImplV4l2::Device( deviceName, i ) ) );
 		}
 	}
 
@@ -508,15 +489,18 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 	*/
 	if( mDevice ) {
 		mName = device->getName();
-	} else {
-		mName = "/dev/video0";
 	}
 
-	mDeviceFD = openDevice( mName.c_str() );
-	initDevice( mDeviceFD, mName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
+	std::stringstream ss;
+	ss << "/dev/video" << mDeviceID;
+	std::string deviceName = ss.str();
+
+	mDeviceFD = openDevice( deviceName.c_str() );
+	initDevice( mDeviceFD, deviceName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
+	mFrameSize = mWidth * mHeight * SurfaceChannelOrder( SurfaceChannelOrder::BGR ).getPixelInc();
 
 	mIsCapturing = false;
-	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 4 ) );
+	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 1 ) );
 
 	mMgrPtr = CaptureMgr::instance();
 }
@@ -562,7 +546,7 @@ bool CaptureImplV4l2::checkNewFrame() const
 {
 	//return CaptureMgr::instanceVI()->isFrameNew( mDeviceID );
 
-	/*
+
     fd_set fds;
     struct timeval tv;
     int r;
@@ -579,8 +563,9 @@ bool CaptureImplV4l2::checkNewFrame() const
     	return false;
     else
     	return true;
-	 */
-	return true;
+
+
+	//return true;
 }
 
 void CaptureImplV4l2::copyUyvyBufferTo( void *dest, const struct buffer buffer )
@@ -699,7 +684,8 @@ Surface8u CaptureImplV4l2::getSurface() const
 		copyUyvyBufferTo( mCurrentFrame.getData(), mBuffers[0]);
 		break;
 
-	default:
+	case V4L2_PIX_FMT_BGR24:
+		memcpy( mCurrentFrame.getData(), mBuffers[0].start, mFrameSize);
 		break;
 	}
 

@@ -60,6 +60,9 @@ set(CinderSamples_LINK_LIBRARIES
 	${CURL_LIBRARIES}
 	${Boost_LIBRARIES}
 	/usr/lib/i386-linux-gnu/libGLEW.so.1.6
+	/usr/lib/i386-linux-gnu/libv4l1.so.0
+	/usr/lib/i386-linux-gnu/libv4l2.so.0
+	/usr/lib/i386-linux-gnu/libv4lconvert.so.0
 )
 
 #add_subdirectory(basicApp)
