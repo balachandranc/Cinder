@@ -72,6 +72,7 @@ class CaptureImplV4l2 {
 	void	init( int32_t width, int32_t height, const Capture::Device &device );
 
 	int								mDeviceID;
+	int								mDeviceFD;
 	// this maintains a reference to the mgr so that we don't destroy it before
 	// the last Capture is destroyed
 	std::shared_ptr<class CaptureMgr>	mMgrPtr;

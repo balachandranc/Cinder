@@ -512,8 +512,8 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 		mName = "/dev/video0";
 	}
 
-	mDeviceID = openDevice( mName.c_str() );
-	initDevice( mDeviceID, mName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
+	mDeviceFD = openDevice( mName.c_str() );
+	initDevice( mDeviceFD, mName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
 
 	mIsCapturing = false;
 	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 4 ) );
@@ -525,7 +525,7 @@ CaptureImplV4l2::~CaptureImplV4l2()
 {
 	this->stop();
 	uninitDevice( &mNumBuffers );
-	closeDevice( mDeviceID );
+	closeDevice( mDeviceFD );
 }
 
 void CaptureImplV4l2::start()
@@ -540,7 +540,7 @@ void CaptureImplV4l2::start()
 	mWidth = CaptureMgr::instanceVI()->getWidth( mDeviceID );
 	mHeight = CaptureMgr::instanceVI()->getHeight( mDeviceID );
 	*/
-	startCapturing( mDeviceID, &mNumBuffers );
+	startCapturing( mDeviceFD, &mNumBuffers );
 	mIsCapturing = true;
 }
 
@@ -549,7 +549,7 @@ void CaptureImplV4l2::stop()
 	if( ! mIsCapturing )
 		return;
 
-	stopCapturing( mDeviceID );
+	stopCapturing( mDeviceFD );
 	mIsCapturing = false;
 }
 
@@ -568,12 +568,12 @@ bool CaptureImplV4l2::checkNewFrame() const
     int r;
 
     FD_ZERO(&fds);
-    FD_SET(mDeviceID, &fds);
+    FD_SET(mDeviceFD, &fds);
 
     tv.tv_sec = 0;
     tv.tv_usec = 1;
 
-    r = select(mDeviceID + 1, &fds, NULL, NULL, &tv);
+    r = select(mDeviceFD + 1, &fds, NULL, NULL, &tv);
 
     if ( -1 == r )
     	return false;
@@ -686,7 +686,7 @@ Surface8u CaptureImplV4l2::getSurface() const
 		CaptureMgr::instanceVI()->getPixels( mDeviceID, mCurrentFrame.getData(), false, true );
 	}
 	*/
-	readFrame( mDeviceID, &mNumBuffers );
+	readFrame( mDeviceFD, &mNumBuffers );
 	mCurrentFrame = mSurfaceCache->getNewSurface();
 
 	switch( mFormat ) {
