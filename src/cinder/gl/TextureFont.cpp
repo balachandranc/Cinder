@@ -328,7 +328,7 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 	::CGContextSetTextMatrix( cgContext, CGAffineTransformIdentity );
 	 */
 	QImage image( (uchar *) surface.getData(), surface.getWidth(), surface.getHeight(), QImage::Format_ARGB32 );
-	//ip::fill( &surface, ColorA( 1, 1, 1, 1 ) );
+	ip::fill( &surface, ColorA( 1, 0, 1, 1 ) );
 	QPainter painter( &image );
 	painter.setFont( *font.getQFont() );
 	painter.setPen( QColor::fromRgbF( 1, 1, 1, 1) );
@@ -343,13 +343,16 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 		GlyphInfo newInfo;
 		newInfo.mTextureIndex = curTextureIndex;
 		Rectf bb = font.getGlyphBoundingBox( *glyphIt );
-		std::cout << "x: " << bb.x1 << " y: " << bb.y1 << " w: " << bb.getWidth() << " h: " << bb.getHeight() << std::endl;
-		//std::cout.flush();
 		Vec2f ul = curOffset + Vec2f( 0, glyphExtents.y - bb.getHeight() );
 		Vec2f lr = curOffset + Vec2f( glyphExtents.x, glyphExtents.y );
-		newInfo.mTexCoords = Area( floor( ul.x ), floor( ul.y ), ceil( lr.x ) + 3, ceil( lr.y ) + 2 );
-		newInfo.mOriginOffset.x = floor(bb.x1) - 1;
-		newInfo.mOriginOffset.y = -(bb.getHeight()-1)-ceil( bb.y1+0.5f );
+		//newInfo.mTexCoords = Area( floor( ul.x ), floor( ul.y ), ceil( lr.x ) + 3, ceil( lr.y ) + 2 );
+		//std::cout << "x: " << newInfo.mTexCoords.getX1() << " y: " << newInfo.mTexCoords.getY1() << " x: " << newInfo.mTexCoords.getX2() << " y: " << newInfo.mTexCoords.getY2() << std::endl;
+		newInfo.mTexCoords = Area( 100, 80, 140, 40);
+		//newInfo.mOriginOffset.x = floor(bb.x1) - 1;
+		//newInfo.mOriginOffset.y = -(bb.getHeight()-1)-ceil( bb.y1+0.5f );
+		newInfo.mOriginOffset.x = 0;
+		newInfo.mOriginOffset.y = 0;
+
 		mGlyphMap[*glyphIt] = newInfo;
 		renderGlyphs[curGlyphIndex] = *glyphIt;
 		renderPositions[curGlyphIndex].setX( curOffset.x - floor(bb.x1) + 1 );
@@ -361,12 +364,6 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 
 			for( int i = 0; i < curGlyphIndex; i++) {
 				painter.drawText( renderPositions[i], QString::fromUtf16( renderGlyphs + i, 1 ) );
-				//std::cout << i << ": Glyph: " << QString::fromUtf16( renderGlyphs + i , 1).toStdString() << " x: " << renderPositions[i].x() << " y: " << renderPositions[i].y() << std::endl;
-				//std::cout << i << ": x: " << bb.x1 << " y: " << bb.y1 << " w: " << bb.getWidth() << " h: " << bb.getHeight() << std::endl;
-				//std::cout.flush();
-				//std::stringstream name;
-				//name << "/tmp/glyphs/glyph" << i << ".png";
-				//writeImage( name.str(), surface );
 			}
 			writeImage( "/tmp/glyphs/g.png", surface );
 
@@ -576,10 +573,18 @@ void TextureFont::drawGlyphs( const std::vector<std::pair<uint16_t,Vec2f> > &gly
 			verts.push_back( clipped.getX2() ); verts.push_back( clipped.getY2() );
 			verts.push_back( clipped.getX1() ); verts.push_back( clipped.getY2() );
 
-			texCoords.push_back( srcTexCoords.getX2() ); texCoords.push_back( srcTexCoords.getY1() );
-			texCoords.push_back( srcTexCoords.getX1() ); texCoords.push_back( srcTexCoords.getY1() );
-			texCoords.push_back( srcTexCoords.getX2() ); texCoords.push_back( srcTexCoords.getY2() );
-			texCoords.push_back( srcTexCoords.getX1() ); texCoords.push_back( srcTexCoords.getY2() );
+			std::cout << "stc x1: " << srcTexCoords.getX1() << " y1: " << srcTexCoords.getY1() << " x2: " << srcTexCoords.getX2() << " y2: " << srcTexCoords.getY2() << std::endl;
+			std::cout.flush();
+
+			//texCoords.push_back( srcTexCoords.getX2() ); texCoords.push_back( srcTexCoords.getY1() );
+			//texCoords.push_back( srcTexCoords.getX1() ); texCoords.push_back( srcTexCoords.getY1() );
+			//texCoords.push_back( srcTexCoords.getX2() ); texCoords.push_back( srcTexCoords.getY2() );
+			//texCoords.push_back( srcTexCoords.getX1() ); texCoords.push_back( srcTexCoords.getY2() );
+
+			texCoords.push_back( 1 ); texCoords.push_back( 0 );
+			texCoords.push_back( 0 ); texCoords.push_back( 0 );
+			texCoords.push_back( 1 ); texCoords.push_back( 1 );
+			texCoords.push_back( 0 ); texCoords.push_back( 1 );
 
 			if( ! colors.empty() ) {
 				for( int i = 0; i < 4; ++i )

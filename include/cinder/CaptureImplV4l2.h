@@ -63,6 +63,12 @@ class CaptureImplV4l2 {
 		int				mUniqueId;
 	};
  protected:
+
+	struct buffer {
+	        void   *start;
+	        size_t  length;
+	};
+
 	void	init( int32_t width, int32_t height, const Capture::Device &device );
 
 	int								mDeviceID;
@@ -72,13 +78,31 @@ class CaptureImplV4l2 {
 	bool								mIsCapturing;
 	std::shared_ptr<class SurfaceCache>	mSurfaceCache;
 
-	int32_t				mWidth, mHeight;
+	int32_t				mWidth, mHeight, mFormat;
+	mutable uint32_t	mNumBuffers;
+	mutable struct buffer *mBuffers;
 	mutable Surface8u	mCurrentFrame;
 	Capture::DeviceRef	mDevice;
 	std::string			mName;
 
 	static bool							sDevicesEnumerated;
 	static std::vector<Capture::DeviceRef>	sDevices;
+
+ private:
+	static void errno_exit(const char*);
+	static int xioctl(int, int, void*);
+	void init_mmap(int, const char*, uint32_t*);
+	static int open_device(const char*);
+	static bool is_capture_device(int);
+	void init_device(int, const char*, int*, int*, int32_t*, uint32_t*);
+	void start_capturing(int, uint32_t*);
+	static int read_frame(int, uint32_t*);
+	void stop_capturing(int);
+	void uninit_device(uint32_t*);
+	void close_device(int);
+
+	static void copy_uyvy_buffer_to( void *dest, const struct buffer buffer );
+	static void copy_yuyv_buffer_to( void *dest, const struct buffer buffer );
 };
 
 } //namespace

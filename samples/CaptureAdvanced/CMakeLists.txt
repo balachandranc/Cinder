@@ -1,0 +1,2 @@
+add_executable(CaptureAdvanced src/CaptureAdvancedApp.cpp)
+target_link_libraries(CaptureAdvanced ${CinderSamples_LINK_LIBRARIES})

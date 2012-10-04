@@ -68,7 +68,8 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(bezierPath)
 ##add_subdirectory(bspline)
 #add_subdirectory(Buddhabrot)
-#add_subdirectory(captureTest)
+add_subdirectory(CaptureAdvanced)
+add_subdirectory(captureTest)
 #add_subdirectory(ClipboardBasic)
 #add_subdirectory(cubeMapping)
 #add_subdirectory(Earthquake)
@@ -112,4 +113,6 @@ set(CinderSamples_LINK_LIBRARIES
 #add_subdirectory(VBOSample)
 #add_subdirectory(VoronoiGpu)
 #add_subdirectory(waterSim)
-#add_subdirectory(Wisteria)
+##add_subdirectory(Wisteria)
+
+#add_subdirectory(Cinder-Str33k3r)
