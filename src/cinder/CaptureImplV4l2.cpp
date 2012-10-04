@@ -135,13 +135,13 @@ class SurfaceCache {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // V4l2 Capture
 
-void CaptureImplV4l2::errno_exit(const char *s)
+void CaptureImplV4l2::errnoExit( const char *str )
 {
-        fprintf(stderr, "%s error %d, %s\n", s, errno, strerror(errno));
+        fprintf(stderr, "%s error %d, %s\n", str, errno, strerror(errno));
         exit(EXIT_FAILURE);
 }
 
-int CaptureImplV4l2::xioctl(int fh, int request, void *arg)
+int CaptureImplV4l2::xioctl( int fh, int request, void *arg )
 {
         int r;
 
@@ -152,7 +152,7 @@ int CaptureImplV4l2::xioctl(int fh, int request, void *arg)
         return r;
 }
 
-void CaptureImplV4l2::init_mmap(int fd, const char *dev_name, uint32_t *n_buffers)
+void CaptureImplV4l2::initMmap( int fd, const char *devName, uint32_t *nBuffers )
 {
         struct v4l2_requestbuffers req;
 
@@ -168,80 +168,80 @@ void CaptureImplV4l2::init_mmap(int fd, const char *dev_name, uint32_t *n_buffer
         if (-1 == xioctl(fd, VIDIOC_REQBUFS, &req)) {
                 if (EINVAL == errno) {
                         fprintf(stderr, "%s does not support "
-                                 "memory mapping\n", dev_name);
+                                 "memory mapping\n", devName);
                         exit(EXIT_FAILURE);
                 } else {
-                        errno_exit("VIDIOC_REQBUFS");
+                        errnoExit("VIDIOC_REQBUFS");
                 }
         }
 
         if (req.count < 1) {
                 fprintf(stderr, "Insufficient buffer memory on %s\n",
-                         dev_name);
+                         devName);
                 exit(EXIT_FAILURE);
         }
 
-        mBuffers = (buffer *) calloc(req.count, sizeof(*mBuffers));
+        mBuffers = (buffer *) calloc( req.count, sizeof( *mBuffers ) );
 
         if (!mBuffers) {
                 fprintf(stderr, "Out of memory\n");
                 exit(EXIT_FAILURE);
         }
 
-        for (*n_buffers = 0; *n_buffers < req.count; ++(*n_buffers) ) {
+        for (*nBuffers = 0; *nBuffers < req.count; ++( *nBuffers ) ) {
                 struct v4l2_buffer buf;
 
-                CLEAR(buf);
+                CLEAR( buf );
 
                 buf.type        = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 buf.memory      = V4L2_MEMORY_MMAP;
-                buf.index       = *n_buffers;
+                buf.index       = *nBuffers;
 
                 if (-1 == xioctl(fd, VIDIOC_QUERYBUF, &buf))
-                        errno_exit("VIDIOC_QUERYBUF");
+                        errnoExit("VIDIOC_QUERYBUF");
 
-                mBuffers[*n_buffers].length = buf.length;
-                mBuffers[*n_buffers].start =
+                mBuffers[*nBuffers].length = buf.length;
+                mBuffers[*nBuffers].start =
                         mmap(NULL /* start anywhere */,
                               buf.length,
                               PROT_READ | PROT_WRITE /* required */,
                               MAP_SHARED /* recommended */,
                               fd, buf.m.offset);
 
-                if (MAP_FAILED == mBuffers[*n_buffers].start)
-                        errno_exit("mmap");
+                if (MAP_FAILED == mBuffers[*nBuffers].start)
+                        errnoExit("mmap");
         }
 }
 
 
-int CaptureImplV4l2::open_device(const char *dev_name)
+int CaptureImplV4l2::openDevice( const char *devName )
 {
         struct stat st;
         int fd;
 
-        if (-1 == stat(dev_name, &st)) {
+        if (-1 == stat(devName, &st)) {
                 fprintf(stderr, "Cannot identify '%s': %d, %s\n",
-                         dev_name, errno, strerror(errno));
+                         devName, errno, strerror(errno));
                 return -1;
         }
 
         if (!S_ISCHR(st.st_mode)) {
-                fprintf(stderr, "%s is no device\n", dev_name);
+                fprintf(stderr, "%s is no device\n", devName);
                 return -1;
         }
 
-        fd = open(dev_name, O_RDWR /* required */ | O_NONBLOCK, 0);
+        fd = open(devName, O_RDWR /* required */ | O_NONBLOCK, 0);
 
         if (-1 == fd) {
                 fprintf(stderr, "Cannot open '%s': %d, %s\n",
-                         dev_name, errno, strerror(errno));
+                         devName, errno, strerror(errno));
                 return -1;
         }
 
         return fd;
 }
 
-bool CaptureImplV4l2::is_capture_device( int fd )
+bool CaptureImplV4l2::isCaptureDevice( int fd )
 {
     struct v4l2_capability cap;
 
@@ -256,7 +256,7 @@ bool CaptureImplV4l2::is_capture_device( int fd )
     return true;
 }
 
-void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int *height, int32_t *format, uint32_t *n_buffers )
+void CaptureImplV4l2::initDevice( int fd, const char *devName, int *width, int *height, int32_t *format, uint32_t *nBuffers )
 {
         struct v4l2_capability cap;
         struct v4l2_cropcap cropcap;
@@ -267,16 +267,16 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
         if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &cap)) {
                 if (EINVAL == errno) {
                         fprintf(stderr, "%s is no V4L2 device\n",
-                                 dev_name);
+                                 devName);
                         exit(EXIT_FAILURE);
                 } else {
-                        errno_exit("VIDIOC_QUERYCAP");
+                        errnoExit("VIDIOC_QUERYCAP");
                 }
         }
 
         if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
                 fprintf(stderr, "%s is no video capture device\n",
-                         dev_name);
+                         devName);
                 exit(EXIT_FAILURE);
         }
 
@@ -329,7 +329,7 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
                 fmt.fmt.pix.field       = V4L2_FIELD_NONE;
 
                 if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                        errno_exit("VIDIOC_S_FMT");
+                        errnoExit("VIDIOC_S_FMT");
 
 
                 if( fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_YUYV && fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_UYVY ) {
@@ -339,7 +339,7 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
                     fmt.fmt.pix.field       = V4L2_FIELD_NONE;
 
                     if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                            errno_exit("VIDIOC_S_FMT");
+                            errnoExit("VIDIOC_S_FMT");
                 }
 
                 if( fmt.fmt.pix.pixelformat != V4L2_PIX_FMT_YUYV &&
@@ -351,7 +351,7 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
                     fmt.fmt.pix.field       = V4L2_FIELD_NONE;
 
                     if (-1 == xioctl(fd, VIDIOC_S_FMT, &fmt))
-                            errno_exit("VIDIOC_S_FMT");
+                            errnoExit("VIDIOC_S_FMT");
                 }
 
                 *width = fmt.fmt.pix.width;
@@ -362,7 +362,7 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
         } else {
                 /* Preserve original settings as set by v4l2-ctl for example */
                 if (-1 == xioctl(fd, VIDIOC_G_FMT, &fmt))
-                        errno_exit("VIDIOC_G_FMT");
+                        errnoExit("VIDIOC_G_FMT");
         }
 
         /* Buggy driver paranoia. */
@@ -373,14 +373,14 @@ void CaptureImplV4l2::init_device( int fd, const char *dev_name, int *width, int
         if (fmt.fmt.pix.sizeimage < min)
                 fmt.fmt.pix.sizeimage = min;
 
-        init_mmap( fd, dev_name, n_buffers );
+        initMmap( fd, devName, nBuffers );
 }
 
-void CaptureImplV4l2::start_capturing( int fd, uint32_t *n_buffers )
+void CaptureImplV4l2::startCapturing( int fd, uint32_t *nBuffers )
 {
         enum v4l2_buf_type type;
 
-        for( int i = 0; i < *n_buffers; ++i ) {
+        for( int i = 0; i < *nBuffers; ++i ) {
         	struct v4l2_buffer buf;
 
             CLEAR( buf );
@@ -389,15 +389,15 @@ void CaptureImplV4l2::start_capturing( int fd, uint32_t *n_buffers )
             buf.index = i;
 
             if( -1 == xioctl( fd, VIDIOC_QBUF, &buf ) )
-            	errno_exit( "VIDIOC_QBUF" );
+            	errnoExit( "VIDIOC_QBUF" );
         }
 
         type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if( -1 == xioctl( fd, VIDIOC_STREAMON, &type ) )
-        	errno_exit( "VIDIOC_STREAMON" );
+        	errnoExit( "VIDIOC_STREAMON" );
 }
 
-int CaptureImplV4l2::read_frame( int fd, uint32_t *n_buffers )
+int CaptureImplV4l2::readFrame( int fd, uint32_t *nBuffers )
 {
         struct v4l2_buffer buf;
 
@@ -417,40 +417,40 @@ int CaptureImplV4l2::read_frame( int fd, uint32_t *n_buffers )
                     /* fall through */
 
                 default:
-                	errno_exit("VIDIOC_DQBUF");
+                	errnoExit("VIDIOC_DQBUF");
         	}
         }
 
-        assert( buf.index < *n_buffers );
+        assert( buf.index < *nBuffers );
 
         if( -1 == xioctl( fd, VIDIOC_QBUF, &buf ) )
-        	errno_exit( "VIDIOC_QBUF" );
+        	errnoExit( "VIDIOC_QBUF" );
 
         return 1;
 }
 
-void CaptureImplV4l2::stop_capturing( int fd )
+void CaptureImplV4l2::stopCapturing( int fd )
 {
         enum v4l2_buf_type type;
 
         type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if( -1 == xioctl( fd, VIDIOC_STREAMOFF, &type ) )
-        	errno_exit( "VIDIOC_STREAMOFF" );
+        	errnoExit( "VIDIOC_STREAMOFF" );
 }
 
-void CaptureImplV4l2::uninit_device(  uint32_t *n_buffers )
+void CaptureImplV4l2::uninitDevice( uint32_t *nBuffers )
 {
-        for( int i = 0; i < *n_buffers; ++i)
+        for( int i = 0; i < *nBuffers; ++i)
         	if( -1 == munmap( mBuffers[i].start, mBuffers[i].length ) )
-        		errno_exit( "munmap" );
+        		errnoExit( "munmap" );
 
         free( mBuffers );
 }
 
-void CaptureImplV4l2::close_device( int fd )
+void CaptureImplV4l2::closeDevice( int fd )
 {
         if (-1 == close(fd))
-                errno_exit( "close" );
+                errnoExit( "close" );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -480,10 +480,10 @@ const vector<Capture::DeviceRef>& CaptureImplV4l2::getDevices( bool forceRefresh
 		ss << "/dev/video" << i;
 		std::string deviceName = ss.str();
 
-		int fd = open_device( deviceName.c_str() );
+		int fd = openDevice( deviceName.c_str() );
 		if( fd == -1 )
 			continue;
-		if( is_capture_device( fd ) ) {
+		if( isCaptureDevice( fd ) ) {
 			close( fd );
 			sDevices.push_back( Capture::DeviceRef( new CaptureImplV4l2::Device( deviceName, i ) ) );
 		}
@@ -512,8 +512,8 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 		mName = "/dev/video0";
 	}
 
-	mDeviceID = open_device( mName.c_str() );
-	init_device( mDeviceID, mName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
+	mDeviceID = openDevice( mName.c_str() );
+	initDevice( mDeviceID, mName.c_str(), &mWidth, &mHeight, &mFormat, &mNumBuffers );
 
 	mIsCapturing = false;
 	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 4 ) );
@@ -524,8 +524,8 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 CaptureImplV4l2::~CaptureImplV4l2()
 {
 	this->stop();
-	uninit_device( &mNumBuffers );
-	close_device( mDeviceID );
+	uninitDevice( &mNumBuffers );
+	closeDevice( mDeviceID );
 }
 
 void CaptureImplV4l2::start()
@@ -540,7 +540,7 @@ void CaptureImplV4l2::start()
 	mWidth = CaptureMgr::instanceVI()->getWidth( mDeviceID );
 	mHeight = CaptureMgr::instanceVI()->getHeight( mDeviceID );
 	*/
-	start_capturing( mDeviceID, &mNumBuffers );
+	startCapturing( mDeviceID, &mNumBuffers );
 	mIsCapturing = true;
 }
 
@@ -549,7 +549,7 @@ void CaptureImplV4l2::stop()
 	if( ! mIsCapturing )
 		return;
 
-	stop_capturing( mDeviceID );
+	stopCapturing( mDeviceID );
 	mIsCapturing = false;
 }
 
@@ -583,7 +583,7 @@ bool CaptureImplV4l2::checkNewFrame() const
 	return true;
 }
 
-void CaptureImplV4l2::copy_uyvy_buffer_to( void *dest, const struct buffer buffer )
+void CaptureImplV4l2::copyUyvyBufferTo( void *dest, const struct buffer buffer )
 {
 	int stride = 4;
 	int numFrames = buffer.length / stride;
@@ -631,7 +631,7 @@ void CaptureImplV4l2::copy_uyvy_buffer_to( void *dest, const struct buffer buffe
 }
 
 
-void CaptureImplV4l2::copy_yuyv_buffer_to( void *dest, const struct buffer buffer )
+void CaptureImplV4l2::copyYuyvBufferTo( void *dest, const struct buffer buffer )
 {
 	int stride = 4;
 	int numFrames = buffer.length / stride;
@@ -686,17 +686,17 @@ Surface8u CaptureImplV4l2::getSurface() const
 		CaptureMgr::instanceVI()->getPixels( mDeviceID, mCurrentFrame.getData(), false, true );
 	}
 	*/
-	read_frame( mDeviceID, &mNumBuffers );
+	readFrame( mDeviceID, &mNumBuffers );
 	mCurrentFrame = mSurfaceCache->getNewSurface();
 
 	switch( mFormat ) {
 
 	case V4L2_PIX_FMT_YUYV:
-		copy_yuyv_buffer_to( mCurrentFrame.getData(), mBuffers[0]);
+		copyYuyvBufferTo( mCurrentFrame.getData(), mBuffers[0]);
 		break;
 
 	case V4L2_PIX_FMT_UYVY:
-		copy_uyvy_buffer_to( mCurrentFrame.getData(), mBuffers[0]);
+		copyUyvyBufferTo( mCurrentFrame.getData(), mBuffers[0]);
 		break;
 
 	default:

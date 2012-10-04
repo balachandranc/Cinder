@@ -89,20 +89,20 @@ class CaptureImplV4l2 {
 	static std::vector<Capture::DeviceRef>	sDevices;
 
  private:
-	static void errno_exit(const char*);
-	static int xioctl(int, int, void*);
-	void init_mmap(int, const char*, uint32_t*);
-	static int open_device(const char*);
-	static bool is_capture_device(int);
-	void init_device(int, const char*, int*, int*, int32_t*, uint32_t*);
-	void start_capturing(int, uint32_t*);
-	static int read_frame(int, uint32_t*);
-	void stop_capturing(int);
-	void uninit_device(uint32_t*);
-	void close_device(int);
+	static void errnoExit( const char *str );
+	static int xioctl( int fh, int request, void *arg );
+	void initMmap( int fd, const char *devName, uint32_t *nBuffers );
+	static int openDevice( const char *devName );
+	static bool isCaptureDevice( int fd );
+	void initDevice( int fd, const char *devName, int *width, int *height, int32_t *format, uint32_t *nBuffers );
+	void startCapturing( int fd, uint32_t *nBuffers );
+	static int readFrame( int fd, uint32_t *nBuffers );
+	void stopCapturing( int fd );
+	void uninitDevice( uint32_t *nBuffers );
+	void closeDevice( int fd );
 
-	static void copy_uyvy_buffer_to( void *dest, const struct buffer buffer );
-	static void copy_yuyv_buffer_to( void *dest, const struct buffer buffer );
+	static void copyUyvyBufferTo( void *dest, const struct buffer buffer );
+	static void copyYuyvBufferTo( void *dest, const struct buffer buffer );
 };
 
 } //namespace
