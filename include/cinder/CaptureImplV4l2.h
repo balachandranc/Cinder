@@ -80,6 +80,7 @@ class CaptureImplV4l2 {
 	std::shared_ptr<class SurfaceCache>	mSurfaceCache;
 
 	int32_t				mWidth, mHeight, mFormat, mFrameSize;
+	mutable int		mCurrentBuffer;
 	mutable uint32_t	mNumBuffers;
 	mutable struct buffer *mBuffers;
 	mutable Surface8u	mCurrentFrame;

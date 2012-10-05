@@ -36,7 +36,7 @@
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define MAX_VIDEO_DEVICES 5
-
+#define NUM_BUFFERS_REQUESTED 4
 
 #include <iostream>
 #include <sstream>
@@ -157,16 +157,13 @@ void CaptureImplV4l2::initMmap( int fd, const char *devName, uint32_t *nBuffers 
 {
         struct v4l2_requestbuffers req;
 
-        CLEAR(req);
+        CLEAR( req );
 
-        //req.count changed from 4 to 1.
-        //req.count = 4;
+        req.count 	= NUM_BUFFERS_REQUESTED;
+        req.type 	= V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        req.memory 	= V4L2_MEMORY_MMAP;
 
-        req.count = 1;
-        req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        req.memory = V4L2_MEMORY_MMAP;
-
-        if (-1 == xioctl(fd, VIDIOC_REQBUFS, &req)) {
+        if (-1 == xioctl( fd, VIDIOC_REQBUFS, &req ) ) {
                 if (EINVAL == errno) {
                         fprintf(stderr, "%s does not support "
                                  "memory mapping\n", devName);
@@ -212,6 +209,8 @@ void CaptureImplV4l2::initMmap( int fd, const char *devName, uint32_t *nBuffers 
                 if (MAP_FAILED == mBuffers[*nBuffers].start)
                         errnoExit("mmap");
         }
+
+        mCurrentBuffer = 0;
 }
 
 
@@ -387,10 +386,12 @@ int CaptureImplV4l2::readFrame( int fd, uint32_t *nBuffers ) const
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
 
+        bool dataRead = true;
         if( -1 == xioctl( fd, VIDIOC_DQBUF, &buf ) ) {
         	switch( errno ) {
             	case EAGAIN:
-            		return 0;
+            		dataRead = false;
+            		break;
 
             	case EIO:
                     /* Could ignore EIO, see spec. */
@@ -398,16 +399,37 @@ int CaptureImplV4l2::readFrame( int fd, uint32_t *nBuffers ) const
                     /* fall through */
 
                 default:
+                	dataRead = false;
                 	errnoExit("VIDIOC_DQBUF");
         	}
         }
 
         assert( buf.index < *nBuffers );
 
-        if( -1 == xioctl( fd, VIDIOC_QBUF, &buf ) )
-        	errnoExit( "VIDIOC_QBUF" );
+        if( dataRead ) {
+        	mCurrentBuffer = buf.index;
+        }
 
-        return 1;
+    	switch( mFormat ) {
+
+    	case V4L2_PIX_FMT_YUYV:
+    		copyYuyvBufferTo( mCurrentFrame.getData(), mBuffers[mCurrentBuffer]);
+    		break;
+
+    	case V4L2_PIX_FMT_UYVY:
+    		copyUyvyBufferTo( mCurrentFrame.getData(), mBuffers[mCurrentBuffer]);
+    		break;
+
+    	case V4L2_PIX_FMT_BGR24:
+    		memcpy( mCurrentFrame.getData(), mBuffers[mCurrentBuffer].start, mFrameSize);
+    		break;
+    	}
+
+        if( dataRead )
+        	if( -1 == xioctl( fd, VIDIOC_QBUF, &buf ) )
+        		errnoExit( "VIDIOC_QBUF" );
+
+        return mCurrentBuffer;
 }
 
 void CaptureImplV4l2::stopCapturing( int fd )
@@ -480,14 +502,6 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 	mDevice = device;
 	if( mDevice ) {
 		mDeviceID = device->getUniqueId();
-	}
-	/*
-	if( ! CaptureMgr::instanceVI()->setupDevice( mDeviceID, mWidth, mHeight ) )
-		throw CaptureExcInitFail();
-	mWidth = CaptureMgr::instanceVI()->getWidth( mDeviceID );
-	mHeight = CaptureMgr::instanceVI()->getHeight( mDeviceID );
-	*/
-	if( mDevice ) {
 		mName = device->getName();
 	}
 
@@ -500,7 +514,7 @@ CaptureImplV4l2::CaptureImplV4l2( int32_t width, int32_t height, const Capture::
 	mFrameSize = mWidth * mHeight * SurfaceChannelOrder( SurfaceChannelOrder::BGR ).getPixelInc();
 
 	mIsCapturing = false;
-	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, 1 ) );
+	mSurfaceCache = std::shared_ptr<SurfaceCache>( new SurfaceCache( mWidth, mHeight, SurfaceChannelOrder::BGR, NUM_BUFFERS_REQUESTED ) );
 
 	mMgrPtr = CaptureMgr::instance();
 }
@@ -516,14 +530,6 @@ void CaptureImplV4l2::start()
 {
 	if( mIsCapturing )
 		return;
-	/*
-	if( ! CaptureMgr::instanceVI()->setupDevice( mDeviceID, mWidth, mHeight ) )
-		throw CaptureExcInitFail();
-	if( ! CaptureMgr::instanceVI()->isDeviceSetup( mDeviceID ) )
-		throw CaptureExcInitFail();
-	mWidth = CaptureMgr::instanceVI()->getWidth( mDeviceID );
-	mHeight = CaptureMgr::instanceVI()->getHeight( mDeviceID );
-	*/
 	startCapturing( mDeviceFD, &mNumBuffers );
 	mIsCapturing = true;
 }
@@ -551,13 +557,13 @@ bool CaptureImplV4l2::checkNewFrame() const
     struct timeval tv;
     int r;
 
-    FD_ZERO(&fds);
-    FD_SET(mDeviceFD, &fds);
+    FD_ZERO( &fds );
+    FD_SET( mDeviceFD, &fds );
 
     tv.tv_sec = 0;
     tv.tv_usec = 1;
 
-    r = select(mDeviceFD + 1, &fds, NULL, NULL, &tv);
+    r = ::select( mDeviceFD + 1, &fds, NULL, NULL, &tv );
 
     if ( -1 == r )
     	return false;
@@ -671,23 +677,11 @@ Surface8u CaptureImplV4l2::getSurface() const
 		CaptureMgr::instanceVI()->getPixels( mDeviceID, mCurrentFrame.getData(), false, true );
 	}
 	*/
-	mCurrentFrame = mSurfaceCache->getNewSurface();
-	readFrame( mDeviceFD, &mNumBuffers );
 
-	switch( mFormat ) {
-
-	case V4L2_PIX_FMT_YUYV:
-		copyYuyvBufferTo( mCurrentFrame.getData(), mBuffers[0]);
-		break;
-
-	case V4L2_PIX_FMT_UYVY:
-		copyUyvyBufferTo( mCurrentFrame.getData(), mBuffers[0]);
-		break;
-
-	case V4L2_PIX_FMT_BGR24:
-		memcpy( mCurrentFrame.getData(), mBuffers[0].start, mFrameSize);
-		break;
-	}
+	//if( checkNewFrame() ) {
+		mCurrentFrame = mSurfaceCache->getNewSurface();
+		readFrame( mDeviceFD, &mNumBuffers );
+	//}
 
 	return mCurrentFrame;
 }
