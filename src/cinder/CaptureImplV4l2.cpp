@@ -671,8 +671,8 @@ Surface8u CaptureImplV4l2::getSurface() const
 		CaptureMgr::instanceVI()->getPixels( mDeviceID, mCurrentFrame.getData(), false, true );
 	}
 	*/
-	readFrame( mDeviceFD, &mNumBuffers );
 	mCurrentFrame = mSurfaceCache->getNewSurface();
+	readFrame( mDeviceFD, &mNumBuffers );
 
 	switch( mFormat ) {
 
