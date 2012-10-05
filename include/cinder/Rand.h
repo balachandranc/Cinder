@@ -195,21 +195,16 @@ class Rand {
 		float theta = randFloat( (float)M_PI * 2.0f );
 		return Vec2f( math<float>::cos( theta ), math<float>::sin( theta ) );
 	}
-
+	
 private:
 	boost::mt19937 mBase;
-	boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > mFloatGen;
+	boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > mFloatGen;	
 	boost::variate_generator<boost::mt19937&, boost::uniform_int<> > mIntGen;
 
 	static boost::mt19937 sBase;
 	static boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > sFloatGen;
 	static boost::variate_generator<boost::mt19937&, boost::uniform_int<> > sIntGen;
-
 };
-
-boost::mt19937 Rand::sBase( 310u );
-boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > Rand::sFloatGen( sBase, boost::uniform_real<float>( 0.0f, 1.0f ) );
-boost::variate_generator<boost::mt19937&, boost::uniform_int<> > Rand::sIntGen( sBase, boost::uniform_int<>( 0, std::numeric_limits<int32_t>::max() ) );
 
 //! Resets the static random generator to the specific seed \a seedValue
 inline void randSeed( uint32_t seedValue ) { Rand::randSeed( seedValue ); }
