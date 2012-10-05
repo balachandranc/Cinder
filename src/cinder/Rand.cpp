@@ -32,9 +32,9 @@
 
 namespace cinder {
 	
-boost::mt19937 Rand::sBase( 310u );
-boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > Rand::sFloatGen( sBase, boost::uniform_real<float>( 0.0f, 1.0f ) );
-boost::variate_generator<boost::mt19937&, boost::uniform_int<> > Rand::sIntGen( sBase, boost::uniform_int<>( 0, std::numeric_limits<int32_t>::max() ) );
+//boost::mt19937 Rand::sBase( 310u );
+//boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > Rand::sFloatGen( sBase, boost::uniform_real<float>( 0.0f, 1.0f ) );
+//boost::variate_generator<boost::mt19937&, boost::uniform_int<> > Rand::sIntGen( sBase, boost::uniform_int<>( 0, std::numeric_limits<int32_t>::max() ) );
 
 void Rand::randomize()
 {
