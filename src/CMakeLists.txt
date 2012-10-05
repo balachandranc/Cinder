@@ -11,6 +11,7 @@ add_definitions(-D_UNICODE)
 add_definitions(-DUNICODE)
 add_definitions(-D__linux__) 
 
+find_package(Boost COMPONENTS system filesystem thread random)
 find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL)

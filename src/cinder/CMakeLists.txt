@@ -52,3 +52,5 @@ add_library(cinder
 	Serial.cpp
 	Matrix.cpp
 )
+
+target_link_libraries(cinder ${Boost_LIBRARIES})

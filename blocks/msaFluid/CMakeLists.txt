@@ -5,3 +5,4 @@ add_library( msafluid
 )
 
 add_subdirectory(samples/msaFluidBasic)
+add_subdirectory(samples/msaFluidParticles)
