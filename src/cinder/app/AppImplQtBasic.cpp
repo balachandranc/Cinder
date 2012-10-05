@@ -50,6 +50,7 @@ AppImplQtBasic::AppImplQtBasic( AppBasic *aApp )
 {
 	mShouldQuit = false;
 	mIsDragging = false;
+	mAnimationTimer = new QTimer();
 }
 
 void AppImplQtBasic::run()
@@ -83,9 +84,6 @@ void AppImplQtBasic::run()
 	::SetFocus( mWnd );
 	 */
 
-	// initialize our next frame time to be definitely now
-	mNextFrameTime = -1;
-	
 	/*
 	MSG msg;
 	while( ! mShouldQuit ) {
@@ -104,10 +102,8 @@ void AppImplQtBasic::run()
 	}
 	 */
 
-	int frameUpdateDelayMs = (int) ( 1000.0f / mFrameRate );
-	mAnimationTimer = new QTimer();
+	setFrameRate( mFrameRate );
 	connect ( mAnimationTimer, SIGNAL ( timeout() ), this, SLOT ( paint() ));
-	mAnimationTimer->start( frameUpdateDelayMs );
 
 	mWindow->setFocusPolicy( Qt::StrongFocus );
 	mWindow->setFocus();

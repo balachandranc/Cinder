@@ -84,7 +84,6 @@ class AppImplQtBasic : public QObject, public AppImplQt {
 	class AppBasic	*mApp;
 	
 	// Qt window variables
-	double					mNextFrameTime;
 	Display					*mDisplay;
 	QGLWidget				*mWindow;
 	QTimer					*mAnimationTimer;
