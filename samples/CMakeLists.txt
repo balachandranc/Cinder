@@ -47,6 +47,12 @@ set(CAIRO_LIBRARIES
 	/usr/lib/i386-linux-gnu/libcairo.a
 	/usr/lib/i386-linux-gnu/libpixman-1.a
 	)
+	
+set(V4L2_LIBRARIES
+	/usr/lib/i386-linux-gnu/libv4l1.so.0
+	/usr/lib/i386-linux-gnu/libv4l2.so.0
+	/usr/lib/i386-linux-gnu/libv4lconvert.so.0
+	)	
 
 message("Cinder libraries: ${CINDER_LIBRARIES}")
 message("Qt libraries: ${QT_LIBRARIES}")
@@ -59,10 +65,7 @@ set(CinderSamples_LINK_LIBRARIES
 	${QT_LIBRARIES}
 	${CURL_LIBRARIES}
 	${Boost_LIBRARIES}
-	/usr/lib/i386-linux-gnu/libGLEW.so.1.6
-	/usr/lib/i386-linux-gnu/libv4l1.so.0
-	/usr/lib/i386-linux-gnu/libv4l2.so.0
-	/usr/lib/i386-linux-gnu/libv4lconvert.so.0
+	${V4L2_LIBRARIES}
 )
 
 #add_subdirectory(basicApp)
