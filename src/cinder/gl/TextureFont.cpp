@@ -315,7 +315,7 @@ TextureFont::TextureFont( const Font &font, const string &utf8Chars, const Forma
 	std::cout << "wide: " << glyphsWide << " tall: " << glyphsTall << std::endl;
 
 	Font::Glyph renderGlyphs[glyphsWide*glyphsTall];
-	QPoint renderPositions[glyphsWide*glyphsTall];
+	QPoint *renderPositions = new QPoint[glyphsWide*glyphsTall];
 
 	Surface surface( mFormat.getTextureWidth(), mFormat.getTextureHeight(), true );
 	ip::fill( &surface, ColorA8u( 0, 0, 0, 0 ) );

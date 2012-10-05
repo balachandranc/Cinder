@@ -4,7 +4,6 @@ add_subdirectory(ip)
 add_subdirectory(cairo)
 add_subdirectory(params)
 include_directories(${CINDER_INCLUDE_DIRS})
-message(" my message ${CINDER_INCLUDE_DIRS}")
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
