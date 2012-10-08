@@ -87,7 +87,7 @@ Buffer AppImplQt::loadResource( const std::string &relativePath )
 
 fs::path AppImplQt::getAppPath()
 {
-	return fs::path( QCoreApplication::applicationFilePath().toStdString() );
+	return fs::path( QCoreApplication::applicationDirPath().toStdString() );
 }
 
 fs::path AppImplQt::getOpenFilePath( const fs::path &initialPath, vector<string> extensions )
