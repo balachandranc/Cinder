@@ -231,19 +231,22 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 		*height = rect.height();
 	}
 
+	mWindow = new QGLWidget();
+
 	if( mFullScreen ) {
 		rect.setLeft( 0 );
 		rect.setRight( *width );
 		rect.setTop( 0 );
 		rect.setBottom( *height );
+		mWindow->showFullScreen();
 	} else { // center the window on the display if windowed
 		rect.setLeft( ( getDisplay()->getWidth() - *width ) / 2 );
 		rect.setRight( ( getDisplay()->getWidth() - *width ) / 2 + *width );
 		rect.setTop( ( getDisplay()->getHeight() - *height ) / 2 );
 		rect.setBottom( ( getDisplay()->getHeight() - *height ) / 2 + *height );
+		mWindow->showNormal();
 	}
 
-	mWindow = new QGLWidget( /*NULL, NULL, Qt::FramelessWindowHint*/ );
 	mWindow->setGeometry( rect );
 	mWindow->setAcceptDrops( true );
 	mWindow->show();
