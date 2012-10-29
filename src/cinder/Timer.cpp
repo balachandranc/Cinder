@@ -80,7 +80,7 @@ double Timer::getSeconds() const
 {
 	if( mIsStopped ) {
 #if defined( CINDER_LINUX )
-		return mStartTime.secsTo( mEndTime );
+		return ( (double) mStartTime.msecsTo( mEndTime ) ) / 1000.0f;
 #else
 		return mEndTime - mStartTime;
 #endif
@@ -92,7 +92,7 @@ double Timer::getSeconds() const
 	::QueryPerformanceCounter( &rawTime );
 	return (rawTime.QuadPart * mInvNativeFreq) - mStartTime;
 #elif defined( CINDER_LINUX )
-	return mStartTime.secsTo( QDateTime::currentDateTime() );
+	return ( (double) mStartTime.msecsTo( QDateTime::currentDateTime() ) ) / 1000.0f;
 #endif
 	}
 }
