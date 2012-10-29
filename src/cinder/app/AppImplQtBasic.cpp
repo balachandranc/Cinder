@@ -231,7 +231,11 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 		*height = rect.height();
 	}
 
-	mWindow = new QGLWidget();
+	QGLFormat qglFormat;
+	qglFormat.setAlpha( true );
+	qglFormat.setSampleBuffers( true );
+
+	mWindow = new QGLWidget( qglFormat );
 
 	if( mFullScreen ) {
 		rect.setLeft( 0 );
