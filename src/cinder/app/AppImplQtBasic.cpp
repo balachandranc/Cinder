@@ -234,6 +234,7 @@ bool AppImplQtBasic::createWindow( int *width, int *height )
 	QGLFormat qglFormat;
 	qglFormat.setAlpha( true );
 	qglFormat.setSampleBuffers( true );
+	qglFormat.setSamples( 4 );
 
 	mWindow = new QGLWidget( qglFormat );
 
