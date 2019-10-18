@@ -41,6 +41,13 @@
 #elif defined( CINDER_MSW )
 	#include "cinder/app/App.h"
 	#include <cairo-win32.h>
+
+    //https://docs.microsoft.com/en-us/cpp/porting/visual-cpp-change-history-2003-2015?redirectedfrom=MSDN&view=vs-2019#stdioh-and-conioh
+#if defined( _MSC_VER ) && ( _MSC_VER >= 1900 )
+    FILE _iob[] = { *stdin, *stdout, *stderr };
+    extern "C" FILE * __cdecl __iob_func( void ) { return _iob; }
+#endif
+
 #endif
 
 using std::vector;
